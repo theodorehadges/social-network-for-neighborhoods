@@ -1,0 +1,136 @@
+users should be able to:
+- register for the service
+- specifiy where they live by either
+    - providing address, or
+    - clicking on their location on a map
+      (actual way can be decided in the 2nd project)
+- post a short profile containing
+    - about me
+    - about family
+    - photo (optional)
+- apply to join a block
+    - if at least three existing members approve, they are accepted
+    - if if there are fewer than three members, all must approve
+
+definitions:
+  - two levels of locality:
+      1) hoods - neighborhoods, such as Bay Ridge or Park Slope
+      2) blocks - a part of the neighborhood but not necessarily one block
+         e.g., "7th Avenue between 3rd and 6th Street" in Park Slope
+      note: i dont understand how blocks/neighborhoods should be modelled
+
+constraints:
+  - user can only be a member of one block
+  - user is automatically a member of the hood in which the block is located
+  - same username cannot be taken by two users. 
+    Doesn't require a second query (piazza 147)
+
+member-member relationships:
+  - friend - can friend other members in the same hood
+      symmetric and requires both sides to accept
+  - neighbors - member can specify direct neighbors, 
+    i.e., members living next door or in the same building or very close by
+
+message board:
+  users should be able to:
+    - post
+    - read
+    - reply
+  to start a new topic, the user:
+    - chooses a subject
+    - chooses who can read/reply to message
+  a user can direct a message to any of the following:
+    - particular person who is a friend
+    - a neighbor
+    - all of their friends
+    - the entire block
+  when others reply to a message, their reply can be read 
+  and replied to by anyone who received the earlier message.
+  In other words, each thread is started by an intitial message 
+  and is visible by the group of people specified in the initial message.
+
+message contains:
+  - title
+  - set of recipients (specified in the initial message)
+  - an author
+  - a timestamp
+  - a text body
+  - coordinates of a location the message refers to (optional)
+ 
+
+
+website
+  - when user visits site, first directed to a main page
+      - main page lists all recent threads they can read, separated into:
+          - neighbor feeds
+          - friend feeds
+          - block feeds
+          - hood feedss
+  - should store info about past accesses to the site by each user
+      - this is so that system can optionally show:
+          - only threads with new messages posted since the 
+            last time the user visited the site
+          - profiles of new members 
+          - threads with messges that are still unread
+      - user can choose to be notified by email of any or certain 
+        types of new messages
+
+changing of blocks
+  - users may leave one block and/or hood and apply for 
+    membership in another block
+  - which content can they access? different implementation choices:
+      - treat messages like email, where the user would still have access to
+        old messages from previous block and hood, 
+        and only see future messages
+        from the new block
+      - user loses access to old threads (except those she posted to) 
+        and gain access to old messages in the new block
+      - same problem arises for new friends and neighbors
+      - make a reasonable choice and justify it
+
+
+
+part 1 todo:
+
+(a) ER diagram, and translate it into relational format. Identify keys and
+foreign key constraints
+
+(b) use a db system to create the db schema, together with foreign key and
+other constraints
+
+(c) write SQL queries for the following tasks:
+    (1) JOINING: write a few (3-4) queries that users need to:
+        - sign up
+        - apply to become members of a block
+        - create or edit their profiles
+    (2) CONTENT POSTING: write queries that implement what happens when a user starts a new
+thread by pospting an initial message and replies to a message
+    (3) FRIENDSHIP: write queries that ussers can use to add or 
+        accept someone as their friend or neighbor, and to list all 
+        their current friends and neighbors
+    (4) BROWSE AND SEARCH MESSAGES: write a few (3-4) different 
+        queries that might be useful when a user accesses content. e.g.,:
+          - list aaall threads in a user's block feed that have new messages
+            since the last time the user accessed the system
+          - list all threads in user's feed that have unread messages
+          - list all messages containing the words "bicycle accident" across
+            all feeds that the user can access
+
+(d) Populate db with sample data and test queries written in part c. Input
+meaningful data which tests a number of cases, but limit to a few users and
+a few messages and threads each.
+    - draw and submit a picture of tables that fits on one or two pages and
+      illustrates test data. (do not submit a list of insert 
+      statements -- SHOW the resulting tables)
+
+(e) Document and log design and testing appropriately. submit:
+    - properly documented description and justification of design
+    - ER diagrams
+    - tables
+    - constraints
+    - queries
+    - proocedures
+    - tests on sample data
+    - few pages of descriptionn
+    - should be 10-15 pages with introduction, explanations, ER and other
+      diagrams, etc., that you will revise and expand in the second part
