@@ -33,4 +33,50 @@ insert into userm(name, email, street, city, state, zipcode, description, photo,
     values('cosmo kramer', 'kramer@kramericaindustries.com', '129 w 81st street 5b', 'new york', 'ny', 10024,
            'It''s like a sauna in here.',
            '/all/photos/kramer.png', 40.784045, -73.974923, 3, now());
+insert into userm(name, email, street, city, state, zipcode, description, photo, lat, lon, block_id, created_on)
+    values('newman', 'newman@postoffice.gov', '129 w 81st street 5e', 'new york', 'ny', 10024,
+           'Hello Jerry.',
+           '/all/photos/newman.png', 40.784045, -73.974923, now());
+
+
+-- apply for block: Newman wants to apply for block.
+-- Since only 2 others live on block, all block members (Jerry and Kramer) have to approve
+insert into block_apply(pending_user, need_approval_by, given_approval, created_on, decided_on)
+    values(6,4,NULL, now(), NULL); -- Jerry needs to approve
+insert into block_apply(pending_user, need_approval_by, given_approval, created_on, decided_on)
+    values(6,5,NULL, now(), NULL); -- Kramer needs to approve
+
+
+
+
+
+
+create table thread(id serial primary key , name varchar, created_on timestamp);
+create table thread_message(id serial primary key , thread_id int references thread(id), author int references userm(id),
+created_time timestamp, title varchar, body varchar, lat float, lang float);
+
+with rows as (
+insert into thread (created_on) VALUES (now()) RETURNING id
+)
+
+insert into thread_message(thread_id, author, created_time, title, body, lat, lon)
+SELECT id, 2,now(), 'Need parking spot', 'I would like a parking spot for 150',
+28.439743, 34.48948
+from rows;
+
+--need to know the thread_id from the front end when a user replies I will have the thread_id
+insert into thread_message(thread_id, author, created_time, title, body, lat, lon)
+values(1, 3, now(), 'Have parking more expensive', 'I have parking for 200',
+28.439743, 34.48948);
+
+--might want to keep friends that have been rejected so they can't spam invites over and over again
+insert into friend_request(user_1_id, user_2_id, approved, created_on)
+values(1,6, NULL, now());
+
+--friend is accepted
+update friend_request
+set approved = True
+where friend_request = 1
+and user_1_id = 1
+and user_2_id = 6;
 

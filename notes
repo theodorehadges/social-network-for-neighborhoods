@@ -134,3 +134,17 @@ a few messages and threads each.
     - few pages of descriptionn
     - should be 10-15 pages with introduction, explanations, ER and other
       diagrams, etc., that you will revise and expand in the second part
+
+
+
+
+
+piazza clarifications:
+
+  - messages: you can decide to what degree you want to 
+    support organization of messages. Maybe, you want to 
+    allow a message to be a reply to another message, by 
+    adding an atttribute inreplyto_messid that can be null 
+    if it is not a reply (157)
+
+  - intro: should be two sentences at most (piazza 165)

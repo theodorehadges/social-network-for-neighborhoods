@@ -18,3 +18,4 @@ create table thread_neighbor(id serial primary key, thread_id int references thr
 create table thread_block(id serial primary key, thread_id int references thread(id), block_id int references block(id));
 create table thread_neighborhood(id serial primary key, thread_id int references thread(id), neighborhood_id int references neighborhood(id));
 
+
