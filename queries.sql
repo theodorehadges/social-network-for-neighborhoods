@@ -13,6 +13,7 @@ from neighbor
 where user_1_id = 4
 or user_2_id = 4);
 
+-------------------------------------------------------------------------------
 --all threads in block feed that have new messages since last time logged on
 select distinct tb.thread_id
 from userm u inner join thread_block tb on u.block_id = tb.block_id
@@ -20,8 +21,7 @@ inner join thread_message tm on tm.thread_id =tb.thread_id
 where u.id = 4
 and tm.created_time > (select max(login_time) from user_log where user_id = 4);
 
---------------------------------------------------------------------------------
--- CHECKED ALL EXCEPT THIS QUERY. need to add data to thread_friend,
+-------------------------------------------------------------------------------
 --all threads in friend feed that have not been read.
 select distinct tf.thread_id
 from userm u inner join friend f on u.id = f.user_1_id or u.id = f.user_2_id

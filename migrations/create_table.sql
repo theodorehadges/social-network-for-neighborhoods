@@ -5,7 +5,6 @@ create table userm(id serial primary key , firstname varchar, lastname varchar, 
 create table profile(id serial primary key, description varchar, photo varchar, user_id int references userm(id) unique, created_on timestamp);
 create table friend(id serial primary key , user_1_id int references userm(id), user_2_id int references userm(id),
     unique (user_1_id, user_2_id), created_on timestamp);
---create table friend(user_1_id int references userm(id), user_2_id int references userm(id), unique (user_1_id, user_2_id), created_on timestamp);
 create table friend_request(id serial primary key , user_1_id int references userm(id), user_2_id int references userm(id),
 approved bool, created_on timestamp);
 --this one is weird

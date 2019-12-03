@@ -38,7 +38,6 @@ insert into user_log(user_id, login_time) values(4, now()); -- Jerry (4) logs in
 insert into user_log(user_id, login_time) values(1, now()); -- Elaine (1) logs inn
 
 -----------------------------------------------------------------------------------------
-
 -- insert profile data
 insert into profile(description, photo, user_id)
     values('I once broke up with someone for not offering me pie.', 'all/photos/elaine', 1);
@@ -54,7 +53,7 @@ insert into profile(description, photo, user_id)
     values('It''s like a sauna in here.', 'all/photos/kramer', 5);
 insert into profile(description, photo, user_id)
     values('Hello Jerry.', 'all/photos/newman', 6);
-select * from block;
+
 -----------------------------------------------------------------------------------------
 -- Jerry joins block. No other members, so he joins without approval
 insert into block_apply(pending_user, given_approval, created_on, decided_on)
@@ -63,7 +62,6 @@ insert into block_apply(pending_user, given_approval, created_on, decided_on)
 insert into block_user(user_id, block_id) values(4, 3);
 
 -----------------------------------------------------------------------------------------
-
 -- Kramer (5) joins block. One other member (4), so need approval by (4)
 insert into block_apply(pending_user, need_approval_by, given_approval, created_on, decided_on)
     values(5, 4, NULL, now(), NULL);
@@ -77,14 +75,13 @@ and need_approval_by = 4;
 
 --when block request is approved simply add it to block_user table
 insert into block_user(user_id, block_id) values(5, 3);
-select * from block_user;
 -----------------------------------------------------------------------------------------
 -- Newman (6) wants to apply for block. 2 other members (4) and (5) must approve it
+-- (same logic would work for three or more members)
 insert into block_apply(pending_user, need_approval_by, given_approval, created_on, decided_on)
     values(6,4,NULL, now(), NULL); -- Jerry needs to approve
 insert into block_apply(pending_user, need_approval_by, given_approval, created_on, decided_on)
     values(6,5,NULL, now(), NULL); -- Kramer needs to approve
-
 
 -- Jerry approves Newman's block request
 update block_apply
@@ -99,72 +96,11 @@ set given_approval = True
 where block_apply.id= 4
 and pending_user = 6
 and need_approval_by = 5;
-select * from block_user;
-select * from block;
+
 --when block request is approved simply add it to block_user table
 insert into block_user(user_id, block_id) values(6, 3);
 
-
 -----------------------------------------------------------------------------------------
--- create a new thread with a message, then have a different person write a new message in that thread
-
--- George creates a thread called 'Need parking spot'
-with rows as (
-insert into thread (created_on) VALUES (now()) RETURNING id
-)
-insert into thread_message(thread_id, author, created_time, title, body, lat, long)
-SELECT id, 2,now(), 'Need parking spot', 'I would like a parking spot for 150',
-28.439743, 34.48948
-from rows;
-
-select * from thread_message;
---need to know the thread_id from the front end when a user replies I will have the thread_id
-insert into thread_message(thread_id, author, created_time, title, body, lat, long)
-values(1, 3, now(), 'Have parking more expensive', 'I have parking for 200',
-28.439743, 34.48948);
------------------------------------------------------------------------------------------
--- Elaine creates a thread called 'Caution: chinese food delivery person rides bike on sidewalk'
-with rows as (
-insert into thread (created_on) VALUES (now()) RETURNING id
-)
-insert into thread_message(thread_id, author, created_time, title, body, lat, long)
-SELECT id, 1,now(), 'Caution: chinese food delivery person rides bike on sidewalk',
-                'I almost got run over today as I was walking to my apartment. The delivery person zoomed' ||
-                    ' by on his way to deliver food to my neighbor. This behavior is causing all sorts of ' ||
-                    'bicycle accidents in the neighborhood.', 28.439743, 34.48948
-from rows;
-
-select * from thread_message;
---need to know the thread_id from the front end when a user replies I will have the thread_id
-insert into thread_message(thread_id, author, created_time, title, body, lat, long)
-values(1, 3, now(), 'Have parking more expensive', 'I have parking for 175',
-28.439743, 34.48948);
-
--- Elaine's new thread is viewable by block
-insert into thread_block(thread_id, block_id) values (3, 3);
-
--- Elaine's new thread is viewable by block
-insert into thread_friend(thread_id, friend_id) values (3, 3);
-select * from thread_friend;
-select * from friend;
------------------------------------------------------------------------------------------
--- Jerry creates a thread called 'what's the deal with bicycle accidents?'
-with rows as (
-insert into thread (created_on) VALUES (now()) RETURNING id
-)
-insert into thread_message(thread_id, author, created_time, title, body, lat, long)
-SELECT id, 4,now(), 'What''s the deal with bicycle accidents?',
-                'Seems like they''ve been happening a lot lately', 28.439743, 34.48948
-from rows;
-
-insert into thread_block(thread_id, block_id) values (3, 3);
-select * from thread_message;
-
-
------------------------------------------------------------------------------------------
-
-
-
 -- FRIENDS
 --might want to keep friends that have been rejected so they can't spam invites over and over again
 -----------------------------------------------------------------------------------------
@@ -215,3 +151,60 @@ and user_2_id = 4;
 --when friend is accepts a request simply add it to friend table
 insert into friend(user_1_id, user_2_id, created_on)
 values(2,4,now());
+
+-----------------------------------------------------------------------------------------
+-- create a new thread with a message, then have a different person write a new message in that thread
+
+-- George creates a thread called 'Need parking spot'
+-- visible to friends
+with rows as (
+insert into thread (created_on) VALUES (now()) RETURNING id
+)
+insert into thread_message(thread_id, author, created_time, title, body, lat, long)
+SELECT id, 2,now(), 'Need parking spot', 'I would like a parking spot for 150',
+28.439743, 34.48948
+from rows;
+
+-- make thread (1) visible to George's (2) friends (only has one friend: row in friends with friend_id = 3)
+insert into thread_friend(thread_id, friend_id) values (1, 3);
+
+-- need to add to messages_read for each friend so that we can keep track of whether they read it
+-- George (2) only has one friend, Jerry (4), so we only need to do one insert. (One insert per friend.)
+insert into message_read(message_id, user_id, read) values (1, 4, FALSE);
+
+-----------------------------------------------------------------------------------------
+-- Newman (6) creates a thread called 'Caution: chinese food delivery person rides bike on sidewalk'
+with rows as (
+insert into thread (created_on) VALUES (now()) RETURNING id
+)
+insert into thread_message(thread_id, author, created_time, title, body, lat, long)
+SELECT id, 6,now(), 'Caution: chinese food delivery person rides bike on sidewalk',
+                'I almost got run over today as I was walking to my apartment. The delivery person zoomed' ||
+                    ' by on his way to deliver food to my neighbor. This behavior is causing all sorts of ' ||
+                    'bicycle accidents in the neighborhood. Later that day, I ordered Chinese food.', 28.439743, 34.48948
+from rows;
+
+-- Newman's new thread is viewable by the block on which he resides (3)
+insert into thread_block(thread_id, block_id) values (2, 3);
+
+-----------------------------------------------------------------------------------------
+-- Jerry creates a thread called 'what's the deal with bicycle accidents?'
+-- He chooses visibility: block and friends
+with rows as (
+insert into thread (created_on) VALUES (now()) RETURNING id
+)
+insert into thread_message(thread_id, author, created_time, title, body, lat, long)
+SELECT id, 4,now(), 'What''s the deal with bicycle accidents?',
+                'Seems like they''ve been happening a lot lately', 28.439743, 34.48948
+from rows;
+
+insert into thread_block(thread_id, block_id) values (3, 3);
+
+-- Jerry's new thread is viewable by friends
+-- for each row in Friends where Jerry (4) is present, insert the friend_id for that row
+insert into thread_friend(thread_id, friend_id) values (3, 2);
+insert into thread_friend(thread_id, friend_id) values (3, 3);
+
+-----------------------------------------------------------------------------------------
+-- Since Jerry posted this message after Kramer's most recent login time, Kramer has not yet seen it
+insert into message_read(message_id, user_id, read) values (1, 4, FALSE);
