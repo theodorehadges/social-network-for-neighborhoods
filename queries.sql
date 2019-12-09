@@ -3,12 +3,12 @@
 --I am looking for all users with id 4
 --logic if user_1_id is 4 then make it null and select user_2_id
 --if user_1_id is not 4 then it is the correct one and user_2_id is actually 4.
-(select coalesce(nullif(user_1_id, 4), user_2_id) as friend_id
+(select coalesce(nullif(user_1_id, 4), user_2_id) as friends_and_neighbors_id
 from friend
 where user_1_id = 4
 or user_2_id = 4)
 union
-(select coalesce(nullif(user_1_id, 4), user_2_id) as friend_id
+(select coalesce(nullif(user_1_id, 4), user_2_id) as friends_and_neighbors_id
 from neighbor
 where user_1_id = 4
 or user_2_id = 4);
@@ -31,7 +31,8 @@ inner join message_read mr on u.id = mr.user_id and tm.id = mr.message_id
 where u.id = 4
 and mr.read = False;
 -------------------------------------------------------------------------------
-
+select * from friend;
+select * from thread_message;
 --all messages containing word bicycle accident accross all feeds
 --friend
 (select tm.id, tm.title, tm.body

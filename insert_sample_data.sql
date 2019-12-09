@@ -3,7 +3,6 @@
 --neighborhood
 insert into neighborhood(name) values('upper west side');
 insert into neighborhood(name) values('long island city');
-
 -----------------------------------------------------------------------------------------
 --block
 insert into block(name, neighborhood_id) values('west 75th st between columbus ave and central park west', 1);
@@ -31,9 +30,8 @@ insert into userm(firstname, lastname, email, street, city, state, zipcode, lat,
 insert into userm(lastname, email, street, city, state, zipcode, lat, long, block_id, created_on) -- no first name
     values('newman', 'newman@postoffice.gov', '129 w 81st street 5e', 'new york',
            'ny', 10024, 40.784045, -73.974923, 3, now());
-
 -----------------------------------------------------------------------------------------
--- login
+-- Jerry logs in
 insert into user_log(user_id, login_time) values(4, now()); -- Jerry (4) logs in
 insert into user_log(user_id, login_time) values(1, now()); -- Elaine (1) logs inn
 
@@ -55,16 +53,36 @@ insert into profile(description, photo, user_id)
     values('Hello Jerry.', 'all/photos/newman', 6);
 
 -----------------------------------------------------------------------------------------
+-- populate neighbor table for upper west side neighbors (all users except id=2)
+insert into neighbor(user_1_id, user_2_id) values (1, 3);
+insert into neighbor(user_1_id, user_2_id) values (1, 4);
+insert into neighbor(user_1_id, user_2_id) values (1, 5);
+insert into neighbor(user_1_id, user_2_id) values (1, 6);
+insert into neighbor(user_1_id, user_2_id) values (3, 4);
+insert into neighbor(user_1_id, user_2_id) values (3, 5);
+insert into neighbor(user_1_id, user_2_id) values (3, 6);
+insert into neighbor(user_1_id, user_2_id) values (4, 5);
+insert into neighbor(user_1_id, user_2_id) values (4, 6);
+
+
+
+-----------------------------------------------------------------------------------------
+update profile
+set description = 'Well, I saw that it''s raining outside, so I called in sick. I don''t work in the rain.'
+where profile.id = 6;
+-----------------------------------------------------------------------------------------
 -- Jerry joins block. No other members, so he joins without approval
-insert into block_apply(pending_user, given_approval, created_on, decided_on)
-    values(4, True, now(), NULL);
---when block request is approved simply add it to block_user table
-insert into block_user(user_id, block_id) values(4, 3);
+insert into block_apply(pending_user, block_id, given_approval, created_on, decided_on)
+    values(4, 3, True, now(), NULL);
+
+update userm
+set block_id = 3
+where id = 4;
 
 -----------------------------------------------------------------------------------------
 -- Kramer (5) joins block. One other member (4), so need approval by (4)
-insert into block_apply(pending_user, need_approval_by, given_approval, created_on, decided_on)
-    values(5, 4, NULL, now(), NULL);
+insert into block_apply(pending_user, block_id, need_approval_by, created_on, decided_on)
+    values(5, 3, 4, now(), NULL);
 
 -- Jerry approves Kramer's block request
 update block_apply
@@ -73,15 +91,16 @@ where block_apply.id= 2
 and pending_user = 5
 and need_approval_by = 4;
 
---when block request is approved simply add it to block_user table
-insert into block_user(user_id, block_id) values(5, 3);
+update userm
+set block_id = 3
+where id = 5;
 -----------------------------------------------------------------------------------------
 -- Newman (6) wants to apply for block. 2 other members (4) and (5) must approve it
 -- (same logic would work for three or more members)
-insert into block_apply(pending_user, need_approval_by, given_approval, created_on, decided_on)
-    values(6,4,NULL, now(), NULL); -- Jerry needs to approve
-insert into block_apply(pending_user, need_approval_by, given_approval, created_on, decided_on)
-    values(6,5,NULL, now(), NULL); -- Kramer needs to approve
+insert into block_apply(pending_user, block_id, need_approval_by, given_approval, created_on, decided_on)
+    values(6,3, 4,NULL, now(), NULL); -- Jerry needs to approve
+insert into block_apply(pending_user, block_id, need_approval_by, given_approval, created_on, decided_on)
+    values(6, 3,5,NULL, now(), NULL); -- Kramer needs to approve
 
 -- Jerry approves Newman's block request
 update block_apply
@@ -97,9 +116,10 @@ where block_apply.id= 4
 and pending_user = 6
 and need_approval_by = 5;
 
---when block request is approved simply add it to block_user table
-insert into block_user(user_id, block_id) values(6, 3);
-
+--when block request is approved simply update the userm table
+update userm
+    set block_id = 3
+where id = 6;
 -----------------------------------------------------------------------------------------
 -- FRIENDS
 --might want to keep friends that have been rejected so they can't spam invites over and over again
@@ -135,7 +155,6 @@ and user_2_id = 4;
 --when friend is accepts a request simply add it to friend table
 insert into friend(user_1_id, user_2_id, created_on)
 values(5,4,now());
-
 -----------------------------------------------------------------------------------------
 -- George (2) sends friend request to Jerry (4)
 insert into friend_request(user_1_id, user_2_id, approved, created_on)
@@ -173,6 +192,13 @@ insert into thread_friend(thread_id, friend_id) values (1, 3);
 insert into message_read(message_id, user_id, read) values (1, 4, FALSE);
 
 -----------------------------------------------------------------------------------------
+-- Jerry replies to George's message
+insert into thread_message(thread_id, author, created_time, in_reply_to_message_id, title, body, lat, long)
+values(1, 3, now(), 1,'Have parking more expensive',
+       'I have parking for 200',28.439743, 34.48948);
+
+
+-----------------------------------------------------------------------------------------
 -- Newman (6) creates a thread called 'Caution: chinese food delivery person rides bike on sidewalk'
 with rows as (
 insert into thread (created_on) VALUES (now()) RETURNING id
@@ -199,7 +225,6 @@ SELECT id, 4,now(), 'What''s the deal with bicycle accidents?',
 from rows;
 
 insert into thread_block(thread_id, block_id) values (3, 3);
-
 -- Jerry's new thread is viewable by friends
 -- for each row in Friends where Jerry (4) is present, insert the friend_id for that row
 insert into thread_friend(thread_id, friend_id) values (3, 2);
