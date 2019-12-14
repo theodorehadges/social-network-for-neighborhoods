@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<form  method=post>
+    {{ tform.hidden_tag() }}
+  <dl>
+    {{ render_field(tform.title) }}
+    {{ render_field(tform.body) }}
+  </dl>
+  <p><input type=submit value=Post></p>
+</form>
+{% endblock %}

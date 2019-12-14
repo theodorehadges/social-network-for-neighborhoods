@@ -1,6 +1,24 @@
+drop table if exists user_log;
+drop table if exists message_read;
+drop table if exists thread_neighborhood;
+drop table if exists thread_block;
+drop table if exists thread_neighbor;
+drop table if exists thread_friend;
+drop table if exists thread_message;
+drop table if exists thread;
+drop table if exists neighbor;
+drop table if exists block_user;
+drop table if exists block_apply;
+drop table if exists friend;
+drop table if exists friend_request;
+drop table if exists profile;
+drop table if exists userm;
+drop table if exists block;
+drop table if exists neighborhood;
+
 create table neighborhood(id serial primary key, name varchar);
 create table block(id serial primary key , name varchar, neighborhood_id int references neighborhood(id) not null);
-create table userm(id serial primary key , firstname varchar, lastname varchar, email varchar not null, street varchar,
+create table userm(id serial primary key , username varchar, password bytea, firstname varchar, lastname varchar, email varchar, street varchar,
     city varchar, state char(2), zipcode int, lat float, long float, block_id int references block(id), created_on timestamp);
 create table profile(id serial primary key, description varchar, photo varchar,
     user_id int references userm(id) unique not null, updated_on timestamp);
@@ -32,20 +50,3 @@ create table message_read(id serial primary key, message_id int references threa
     user_id int references userm(id) not null, read bool);
 create table user_log(id serial primary key, user_id int references userm(id) not null, login_time timestamp);
 
-drop table if exists user_log;
-drop table if exists message_read;
-drop table if exists thread_neighborhood;
-drop table if exists thread_block;
-drop table if exists thread_neighbor;
-drop table if exists thread_friend;
-drop table if exists thread_message;
-drop table if exists thread;
-drop table if exists neighbor;
-drop table if exists block_user;
-drop table if exists block_apply;
-drop table if exists friend;
-drop table if exists friend_request;
-drop table if exists profile;
-drop table if exists userm;
-drop table if exists block;
-drop table if exists neighborhood;

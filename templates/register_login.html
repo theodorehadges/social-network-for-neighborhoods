@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<form  action="/login" method=post>
+    {{ lform.hidden_tag() }}
+  <dl>
+    {{ render_field(lform.username) }}
+    {{ render_field(lform.password) }}
+  </dl>
+  <p><input type=submit value=Login></p>
+</form>
+<form action="/register" method=post>
+   {{ rform.hidden_tag() }}
+    <dl>
+        {{ render_field(rform.username) }}
+        {{ render_field(rform.password) }}
+    </dl>
+    <p><input type=submit value=Register></p>
+</form>
+{% endblock %}

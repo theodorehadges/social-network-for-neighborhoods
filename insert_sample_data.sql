@@ -11,24 +11,24 @@ insert into block(name, neighborhood_id) values('west 81st st between columbus a
 
 -----------------------------------------------------------------------------------------
 -- register
-insert into userm(firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
-    values('elaine', 'benes', 'eb@pendantpublishing.com', '16 west 75th street apt 2g',
+insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
+    values('elaine','elaine', 'benes', 'eb@pendantpublishing.com', '16 west 75th street apt 2g',
            'new york', 'ny', 10023, 40.778854, -73.973874, 1, now());
-insert into userm(firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
-    values('george', 'costanza', 'gcostanza@vandeleyindustries.com', '1344 queens blvd',
+insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
+    values('george','george', 'costanza', 'gcostanza@vandeleyindustries.com', '1344 queens blvd',
            'queens', 'ny', 11101,40.744303, -73.926108, 2, now());
-insert into userm(firstname, lastname, email, street, city, state, zipcode, lat, long, created_on) -- no photo/block_id
-    values('art', 'vandeley', 'artvandaley@vandeleyindustries.com',
+insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, created_on) -- no photo/block_id
+    values('art','art', 'vandeley', 'artvandaley@vandeleyindustries.com',
            '129 w 81st street 5a', 'new york', 'ny', 10024,
            40.784045, -73.974923, now());
-insert into userm(firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
-    values('jerry', 'seinfeld', 'jsein@nofaxmachine.com', '129 w 81st street 5a',
+insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
+    values('jerry','jerry', 'seinfeld', 'jsein@nofaxmachine.com', '129 w 81st street 5a',
            'new york', 'ny', 10024, 40.784045, -73.974923, 3, now());
-insert into userm(firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
-    values('cosmo', 'kramer', 'kramer@kramericaindustries.com', '129 w 81st street 5b',
+insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
+    values('cosmo','cosmo', 'kramer', 'kramer@kramericaindustries.com', '129 w 81st street 5b',
            'new york', 'ny', 10024, 40.784045, -73.974923, 3, now());
-insert into userm(lastname, email, street, city, state, zipcode, lat, long, block_id, created_on) -- no first name
-    values('newman', 'newman@postoffice.gov', '129 w 81st street 5e', 'new york',
+insert into userm(username, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on) -- no first name
+    values('newman', 'newman', 'newman@postoffice.gov', '129 w 81st street 5e', 'new york',
            'ny', 10024, 40.784045, -73.974923, 3, now());
 -----------------------------------------------------------------------------------------
 -- Jerry logs in
