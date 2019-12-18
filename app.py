@@ -76,7 +76,6 @@ def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         password = form.password.data
-        print(password)
         bcrypt_hash = bcrypt.generate_password_hash(password=password)
         try:
             print(bcrypt_hash)
@@ -113,10 +112,7 @@ def validate_user(username, password):
 @app.route("/logout")
 @login_required
 def logout():
-    last_log = current_user.log_logs[-1]
     logout_user()
-    last_log.logout_time = datetime.datetime.now()
-    db.session.commit()
     return redirect("/")
 
 
