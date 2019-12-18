@@ -67,9 +67,22 @@ def thread():
 @app.route('/thread/<int:thread_id>')
 @login_required
 def get_thread(thread_id):
-    messages = get_messages_by_thread_id(thread_id)
+    #messages = get_messages_by_thread_id(thread_id)
+    messages = get_messages_by_thread_id(2)
+
     print(messages)
     return "yay"
+
+
+@app.route('/addfriend')
+@login_required
+def get_users():
+    #messages = get_messages_by_thread_id(thread_id)
+    users = get_user_list()
+
+    print(users)
+    return "users"
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

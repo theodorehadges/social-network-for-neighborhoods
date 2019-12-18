@@ -48,3 +48,10 @@ def get_messages_by_thread_id(thread_id):
         {"ti": thread_id}
     )
     return messages
+
+
+def get_user_list():
+    users = db.session.execute(
+        """select id, firstname, lastname
+        from userm""")
+    return(users)
