@@ -10,7 +10,7 @@ from flask import Flask, redirect, request, flash, render_template
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 
-from forms import RegistrationForm, LoginForm, ThreadForm
+from forms import RegistrationForm, LoginForm, ThreadForm, FriendRequestForm, FriendAcceptForm
 from models import *
 from util import make_thread_message_into_thread
 
@@ -74,15 +74,31 @@ def get_thread(thread_id):
     return "yay"
 
 
-@app.route('/addfriend')
+@app.route('/possible_friends', methods=['GET', 'POST'])
 @login_required
-def get_users():
-    #messages = get_messages_by_thread_id(thread_id)
-    users = get_user_list()
+def possible_friends():
+    form = FriendRequestForm(request.form)
+    users = get_user_list(current_user.id)
+    if form.validate_on_submit():
+        friend_id = form.request_id.data
+        make_request_record(current_user.id, friend_id)
+        return redirect("feeds")
+    return render_template("possible_friends.html", form=form, users=users)
 
-    print(users)
-    return "users"
 
+@app.route('/pending_friends', methods=['GET', 'POST'])
+@login_required
+def pending_friends():
+    form = FriendAcceptForm(request.form)
+    pfriends = get_pending_friends(current_user.id)
+    if form.validate_on_submit():
+        r_id = form.request_id.data
+        if form.request_accept.data:
+            update_request_friends(current_user.id, r_id, True)
+        else:
+            update_request_friends(current_user.id, r_id, False)
+        return redirect('friends')
+    return render_template("pending_friends.html", form=form, users=pfriends)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -110,6 +126,8 @@ def login():
         username = form.username.data
         password = form.password.data
         if validate_user(username, password):
+            found_user = User.query.filter_by(username=username).first()
+            flask_login.login_user(found_user)
             return redirect('/feeds')
         return '<div id="result">Incorrect</div>'
     return render_template('login.html', form=form)

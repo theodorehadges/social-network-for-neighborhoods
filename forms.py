@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, PasswordField, validators, TextAreaField
+from wtforms import BooleanField, StringField, PasswordField, validators, TextAreaField, HiddenField, SubmitField
+
 
 class LoginForm(FlaskForm):
     username = StringField('Username', id="luname", validators=[validators.Length(min=4, max=25), validators.DataRequired()])
@@ -17,11 +18,12 @@ class ThreadForm(FlaskForm):
     body = StringField("Message", id="message", validators=[validators.DataRequired()])
 
 
-class QueryForm(FlaskForm):
-    query_id = StringField('Query Id', id="userquery", validators=[validators.DataRequired()])
+class FriendAcceptForm(FlaskForm):
+    request_id = HiddenField()
+    request_accept = SubmitField('Accept')
+    request_remove = SubmitField('Remove')
 
 
-class LoggerForm(FlaskForm):
-    user_id = StringField('User Id', id="userid", validators=[validators.DataRequired()])
-
-
+class FriendRequestForm(FlaskForm):
+    request_id = HiddenField()
+    request_invite = SubmitField('Invite')
