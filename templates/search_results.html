@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+{% for search_result in search_results %}
+<p><a href="/thread/{{search_result[0]}}">{{ search_result[1] }}</a></p>
+
+{% endfor %}
+{% endblock %}

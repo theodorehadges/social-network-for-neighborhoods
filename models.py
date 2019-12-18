@@ -38,49 +38,85 @@ def make_thread(uid, title, body):
     ).fetchone()
     return thread[0]
 
+
+friend_query = "(select tm.thread_id, tm.title \
+            from userm u inner join friend f on u.id = f.user_1_id or u.id \
+            = f.user_2_id \
+            inner join thread_friend tf on f.id = tf.friend_id \
+            inner join thread_message tm on tf.thread_id = tm.thread_id \
+            where u.id = 4 \
+            and (tm.body ilike :search_text \
+            or tm.title ilike :search_text))"
+
+neighbor_query = "(select tm.thread_id, tm.title \
+        from userm u inner join neighbor n on u.id = n.user_1_id or u.id \
+            = n.user_2_id \
+            inner join thread_friend tf on n.id = tf.friend_id \
+            inner join thread_message tm on tf.thread_id = tm.thread_id \
+            where u.id = 4 \
+            and (tm.body ilike :search_text  \
+            or tm.title ilike :search_text))" 
+
+neighborhood_query = "(select tm.thread_id, tm.title \
+            from userm u inner join block b on u.block_id = b.id \
+            inner join neighborhood nh on b.neighborhood_id = nh.id \
+            inner join thread_neighborhood tnh on nh.id = tnh.neighborhood_id \
+            inner join thread_message tm on tm.thread_id =tnh.thread_id \
+            where u.id = 4 \
+            and (tm.body ilike :search_text  \
+            or tm.title ilike :search_text))"
+
+block_query = "(select tm.thread_id, tm.title \
+            from userm u inner join thread_block tb \
+            on u.block_id = tb.block_id \
+            inner join thread_message tm on tm.thread_id =tb.thread_id \
+            where u.id = 4 \
+            and (tm.body ilike :search_text  \
+            or tm.title ilike :search_text))"
+
+
 # TODO: add case when no results found
 def search_threads(uid, search_type, search_text):
     search_text = "%" + search_text + "%"
     #search_text = "%bicycle"
     if search_type == "all":
+        query = friend_query + 'union' + neighbor_query + 'union' \
+                + neighborhood_query + 'union' + block_query
         result = db.session.execute(
-            """
-            (select tm.thread_id, tm.title
-            from userm u inner join friend f on u.id = f.user_1_id or u.id = f.user_2_id
-            inner join thread_friend tf on f.id = tf.friend_id
-            inner join thread_message tm on tf.thread_id = tm.thread_id
-            where u.id = 4
-            and (tm.body ilike :search_text
-            or tm.title ilike :search_text))
-            union
-            (select tm.thread_id, tm.title
-            from userm u inner join neighbor n on u.id = n.user_1_id or u.id = n.user_2_id
-            inner join thread_friend tf on n.id = tf.friend_id
-            inner join thread_message tm on tf.thread_id = tm.thread_id
-            where u.id = 4
-            and (tm.body ilike :search_text 
-            or tm.title ilike :search_text))
-            union
-            (select tm.thread_id, tm.title
-            from userm u inner join block b on u.block_id = b.id
-            inner join neighborhood nh on b.neighborhood_id = nh.id
-            inner join thread_neighborhood tnh on nh.id = tnh.neighborhood_id
-            inner join thread_message tm on tm.thread_id =tnh.thread_id
-            where u.id = 4
-            and (tm.body ilike :search_text 
-            or tm.title ilike :search_text))
-            union
-            (select tm.thread_id, tm.title
-            from userm u inner join thread_block tb on u.block_id = tb.block_id
-            inner join thread_message tm on tm.thread_id =tb.thread_id
-            where u.id = 4
-            and (tm.body ilike :search_text 
-            or tm.title ilike :search_text))""",
+            query,
+            {'uid': uid, 'search_type': search_type, \
+                    'search_text': search_text}
+            )
+    elif search_type == "friend":
+        query = friend_query
+        result = db.session.execute(
+            query,
+            {'uid': uid, 'search_type': search_type, \
+                    'search_text': search_text}
+            )
+    elif search_type == "neighbor":
+        query = neighbor_query
+        result = db.session.execute(
+            query,
+            {'uid': uid, 'search_type': search_type, \
+                    'search_text': search_text}
+            )
+    elif search_type == "neighborhood":
+        query = neighborhood_query
+        result = db.session.execute(
+            query,
+            {'uid': uid, 'search_type': search_type, \
+                    'search_text': search_text}
+            )
+    elif search_type == "block":
+        query = block_query
+        result = db.session.execute(
+            query,
             {'uid': uid, 'search_type': search_type, \
                     'search_text': search_text}
             )
     else:
-        return("no type specified")
+        return("no type specified. (shouldn't get here)")
     return (result)
 
 
