@@ -10,7 +10,7 @@ from flask import Flask, redirect, request, flash, render_template
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 
-from forms import RegistrationForm, LoginForm, ThreadForm
+from forms import RegistrationForm, LoginForm, ThreadForm, SearchForm
 from models import *
 from util import make_thread_message_into_thread
 
@@ -72,6 +72,21 @@ def get_thread(thread_id):
 
     print(messages)
     return "yay"
+
+@app.route('/thread/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    form = SearchForm(request.form)
+
+    if form.validate_on_submit():
+        search_type = form.search_type.data
+        search_text = form.search_text.data
+        search_results = search_threads(current_user.id, search_type, search_text)
+        return render_template()
+    return render_template("search.html", tform=form)
+   
+
+
 
 
 @app.route('/addfriend')
