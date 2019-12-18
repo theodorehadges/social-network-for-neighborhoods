@@ -98,8 +98,45 @@ def get_messages_by_thread_id(thread_id):
     return messages
 
 
-def get_user_list():
+def get_user_list(cu_id):
     users = db.session.execute(
-        """select id, firstname, lastname
-        from userm""")
-    return(users)
+        """select id, username, firstname, lastname
+        from userm
+        where id != :cu_id""",
+        {"cu_id": cu_id}
+    )
+    return users
+
+
+def make_request_record(cu_id, friend_id):
+    db.session.execute(
+        """insert into friend_request(user_1_id, user_2_id,approved, created_on)
+            values(:cu_id, :friend_id, NULL, now())""",
+        {"cu_id": cu_id, "friend_id": friend_id}
+    )
+    db.session.commit()
+
+
+def get_pending_friends(cu_id):
+    """Only need to check for user_id_2 because everytime we request a friend the requester is user_id_1 and the person
+    who needs to respond is user_id_2"""
+    users = db.session.execute(
+        """select fr.user_1_id, u.username, u.firstname, u.lastname
+        from friend_request as fr inner join userm as u on fr.user_1_id = u.id 
+        where fr.user_2_id = :cu_id
+        and fr.approved is NULL""",
+        {"cu_id": cu_id}
+    )
+    return users
+
+
+def update_request_friends(cu_id, user_1_id, approved):
+    db.session.execute(
+        """update friend_request
+        set approved = :approved
+        where user_1_id = :user_1_id
+        and user_2_id = :cu_id
+        and approved is NULL""",
+        {"approved": approved, "user_1_id": user_1_id, "cu_id": cu_id}
+    )
+    db.session.commit()

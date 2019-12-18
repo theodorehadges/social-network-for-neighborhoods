@@ -69,3 +69,23 @@ inner join thread_message tm on tm.thread_id =tb.thread_id
 where u.id = 4
 and (tm.body ilike '%bicycle accident%'
 or tm.title ilike '%bicycle accident%'))
+
+
+
+CREATE OR REPLACE FUNCTION check_friend_request_approval()
+RETURNS trigger AS
+$BODY$
+BEGIN
+if new.approved = true THEN
+raise notice 'inserting new record friend';
+insert into friend(user_1_id, user_2_id, created_on)
+values(new.user_1_id, new.user_2_id, now());
+end if;
+RETURN NEW;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+CREATE TRIGGER check_update_friend_request
+AFTER UPDATE ON friend_request
+FOR EACH ROW
+EXECUTE PROCEDURE check_friend_request_approval();
