@@ -82,7 +82,8 @@ def search():
         search_type = form.search_type.data
         search_text = form.search_text.data
         search_results = search_threads(current_user.id, search_type, search_text)
-        return render_template()
+        print(search_results)
+        return render_template("search_results.html", search_results=search_results)
     return render_template("search.html", tform=form)
    
 
