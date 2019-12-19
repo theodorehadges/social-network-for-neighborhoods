@@ -8,6 +8,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(255), unique=True)
     password = db.Column(db.LargeBinary())
     email = db.column(db.String(255))
+    block_id = db.Column(db.Integer)
 
 
 def get_thread_friend_unread(uid):
@@ -34,20 +35,46 @@ def get_profile_info_from_uid(uid):
     return record
 
 
-def make_thread(uid, title, body):
+def make_thread(uid, title, body, type):
     thread = db.session.execute(
-        """with rows as (
-    insert into thread (created_on) VALUES (now()) RETURNING id
-), em as (
-    insert into thread_message(thread_id, author, created_time, title, body, lat, long)
-    SELECT id, :uid, now(), :title , :body,
-    28.439743, 34.48948
-    from rows)
-    select id from rows;""",
-        {'uid': uid, 'title': title, 'body': body}
-    ).fetchone()
+            """with rows as (insert into thread(name, created_on) VALUES (:title, now()) RETURNING id)
+    select id from rows;
+            """,
+        {"title": title}).fetchone()
+    db.session.commit()
+    insert_type_thread_query(thread[0], type, uid)
+    insert_message_reply(thread[0], uid, title, body)
     return thread[0]
 
+
+def insert_type_thread_query(thread_id, type, cu_id):
+    if type == "friends":
+        query = """insert into thread_friend(thread_id, friend_id) 
+                    select :thread_id, coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
+                    from friend
+                    where user_1_id = :cu_id
+                    or user_2_id = :cu_id"""
+    elif type == "neighborhood":
+        query = """insert into thread_neighborhood(thread_id, neighborhood_id) 
+                    select :thread_id, block_id 
+                    from userm u inner join block b on b.id = u.block_id
+                    inner join neighborhood n on n.id = b.neighborhood_id 
+                    where id = :cu_id"""
+    elif type == "neighbor":
+        query = """insert into thread_neighbor(thread_id, neighbor_id) 
+                    select :thread_id, coalesce(nullif(user_1_id, :cu_id), user_2_id) as n_id
+                    from neighbor
+                    where user_1_id = :cu_id
+                    or user_2_id = :cu_id"""
+    elif type == "block":
+        query = """insert into thread_block(thread_id, block_id) 
+                    select :thread_id, block_id 
+                    from userm
+                    where id = :cu_id"""
+    else:
+        print("something went wrong couldn't insert into anything")
+    db.session.execute(query, {"thread_id": thread_id, "cu_id": cu_id})
+    db.session.commit()
 
 friend_query = "(select tm.thread_id, tm.title \
             from userm u inner join friend f on u.id = f.user_1_id or u.id \
@@ -349,7 +376,111 @@ def insert_user(reg_form, bcrypt_hash):
         values(:username, :password, :firstname, :lastname, :email, :street, :city, :state, :zipcode, 22, 33, now())
         """,
         {"username": username, "password": password,
-         "firstname": password, "lastname": lastname, "email": email,
+         "firstname": firstname, "lastname": lastname, "email": email,
          "street": street, "city": city, "state": state, "zipcode": zipcode, "lat": lat,
          "long": long}
     )
+    db.session.commit()
+
+def get_neighborhoods():
+    neighborhoods = db.session.execute(
+        """
+        select id, name
+        from neighborhood
+        """,
+        {}
+    )
+    return neighborhoods
+
+
+def get_blocks(neighborhood_id):
+    blocks = db.session.execute(
+        """
+        select id, name
+        from block
+        where neighborhood_id = :neighborhood_id
+        """,
+        {"neighborhood_id": neighborhood_id}
+    )
+    return blocks
+
+
+def insert_into_block_apply(cu_id, block_id):
+    db.session.execute(
+        """
+        insert into block_apply(pending_user, need_approval_by, block_id, created_on)
+        select :cu_id, id, :block_id, now()
+        from userm
+        where id != :cu_id
+        and block_id = :block_id;
+        """,
+        {"cu_id": cu_id, "block_id": block_id}
+    )
+    db.session.commit()
+
+
+def insert_into_neighbors(cu_id, block_id):
+    pass
+
+
+def get_all_neighbors(cu_id):
+    users = db.session.execute(
+          """with uf as (select coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
+        from neighbor
+        where user_1_id = :cu_id
+        or user_2_id = :cu_id)
+        select u.id, u.username, u.firstname, u.lastname
+        from uf inner join userm u on uf.uf_id = u.id""",
+          {"cu_id": cu_id}
+    )
+    return users
+
+
+def get_neighbors_from_block(cu_id, block_id):
+    users = db.session.execute(
+    """
+    select id
+    from userm
+    where block_id = :block_id
+    and id != :cu_id;
+    """,
+    {"block_id": block_id, "cu_id": cu_id}
+    )
+    return users
+
+
+def update_block_on_uid(cu_id, block_id):
+    db.session.execute(
+        """
+        update userm
+        set block_id = :block_id
+        where id = :cu_id
+        """,
+        {"cu_id": cu_id, "block_id": block_id}
+    )
+    db.session.commit()
+
+
+def get_pending_block_approvals(cu_id):
+    users = db.session.execute(
+        """select ba.pending_user, u.username, u.firstname, u.lastname
+        from block_apply as ba inner join userm as u on ba.pending_user = u.id 
+        where ba.need_approval_by = :cu_id
+        and ba.given_approval is NULL""",
+        {"cu_id": cu_id}
+    )
+    return users
+
+
+def update_block_approval(block_id, pending_id, cu_id, approval):
+    db.session.execute(
+        """
+        update block_apply
+        set given_approval = :approval
+        where block_id = :block_id
+        and pending_user = :pending_id
+        and need_approval_by = :cu_id
+        """,
+        {"block_id": block_id, "pending_id": pending_id, "cu_id": cu_id, "approval": approval}
+    )
+    db.session.commit()

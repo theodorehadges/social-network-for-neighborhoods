@@ -233,3 +233,36 @@ insert into thread_friend(thread_id, friend_id) values (3, 3);
 -----------------------------------------------------------------------------------------
 -- Since Jerry posted this message after Kramer's most recent login time, Kramer has not yet seen it
 insert into message_read(message_id, user_id, read) values (1, 4, FALSE);
+
+
+
+insert into neighborhood(name)
+values('williamsbug'),
+       ('midtown'),
+       ('upper east side'),
+       ('long island city'),
+       ('mainville'),
+       ('hotchiks');
+
+insert into block(name, neighborhood_id)
+values('block11', 1),
+       ('block21', 1),
+       ('block31', 1),
+       ('block12', 2),
+       ('block22', 2),
+       ('block32', 2),
+       ('block13', 3),
+       ('block23', 3),
+       ('block33', 3),
+       ('block14', 4),
+       ('block24', 4),
+       ('block34', 4),
+       ('block15', 5),
+       ('block25', 5),
+       ('block35', 5),
+       ('block16', 6),
+       ('block26', 6),
+       ('block36', 6),
+       ('block17', 7),
+       ('block27', 7),
+       ('block37', 7);

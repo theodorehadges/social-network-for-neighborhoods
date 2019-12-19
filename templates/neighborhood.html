@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<form  method=post>
+    {{ form.csrf_token() }}
+  <dl>
+    {{ render_field(form.neighborhood_type) }}
+    {{ render_field(form.block_type) }}
+  </dl>
+  <p><input type=submit value=Apply></p>
+</form>
+<script type="text/javascript" charset="utf-8">
+ $('#neighborhoodid').on('change', function() {
+            $("#blockid").empty();
+
+            n_name = $("#neighborhoodid option:selected").text();
+            n_id = $("#neighborhoodid option:selected").val();
+            $.getJSON('/block', {
+                n_namea: n_name,
+                n_ida: n_id
+            }, function(data) {
+                var block_list = data["blocks"]
+                var options = $("#blockid");
+                $.each(block_list, function() {
+                    options.append($("<option />").val(this[0]).text(this[1]));
+                });
+
+            })
+ });
+</script>
+{% endblock %}

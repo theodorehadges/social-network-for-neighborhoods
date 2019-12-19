@@ -89,3 +89,38 @@ CREATE TRIGGER check_update_friend_request
 AFTER UPDATE ON friend_request
 FOR EACH ROW
 EXECUTE PROCEDURE check_friend_request_approval();
+
+
+
+
+CREATE OR REPLACE FUNCTION check_block_approval()
+RETURNS trigger AS
+$BODY$
+DECLARE
+count_approvals int;
+count_all int;
+BEGIN
+if new.given_approval = true THEN
+select count(*) into count_approvals
+from block_apply
+where pending_user = new.pending_user
+and block_id = new.block_id
+and given_approval = true;
+select count(*) into count_all
+from block_apply
+where pending_user = new.pending_user
+and block_id = new.block_id;
+if (count_approvals >= 3) or (count_approvals = count_all) then
+update userm
+set block_id = new.block_id
+where id = new.pending_user;
+end if;
+end if;
+RETURN NEW;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
+CREATE TRIGGER check_update_block_apply
+AFTER UPDATE ON block_apply
+FOR EACH ROW
+EXECUTE PROCEDURE check_block_approval();
