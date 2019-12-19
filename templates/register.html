@@ -1,17 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-
-</head>
-<body>
+{% extends "layout.html" %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
 {% from "_formhelpers.html" import render_field %}
-<form method=post>
+<form action="/register" method=post>
    {{ form.hidden_tag() }}
     <dl>
         {{ render_field(form.username) }}
         {{ render_field(form.password) }}
+        {{ render_field(form.firstname) }}
+        {{ render_field(form.lastname) }}
+        {{ render_field(form.email) }}
+        {{ render_field(form.street) }}
+        {{ render_field(form.city) }}
+        {{ render_field(form.zipcode) }}
+        {{ render_field(form.state) }}
+
     </dl>
     <p><input type=submit value=Register></p>
 </form>
-</body>
-</html>
+<style type="text/css">
+     #map {
+        width: 300px;
+        height: 300px;
+         left: 400px;
+         bottom: 600px
+      }
+    </style>
+    <div id="map"></div>
+    <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -34.397, lng: 150.644},
+          zoom: 8
+        });
+        google.maps.event.addListener(map,'click',function(event) {
+    console.info(event.latLng.lat());  // print lat of click pos
+    console.info(event.latLng.lng());  // print lng of click pos
+    });
+      }
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOU_API_KEY_HERE&callback=initMap"
+    async defer></script>
+
+{% endblock %}

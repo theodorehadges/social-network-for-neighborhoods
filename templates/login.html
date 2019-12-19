@@ -1,17 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-
-</head>
-<body>
+{% extends "layout.html" %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
 {% from "_formhelpers.html" import render_field %}
-<form method=post>
-    {{ form.hidden_tag() }}
+<form  action="/login" method=post>
+    {{ lform.hidden_tag() }}
   <dl>
-    {{ render_field(form.username) }}
-    {{ render_field(form.password) }}
+    {{ render_field(lform.username) }}
+    {{ render_field(lform.password) }}
   </dl>
-  <p><input type=submit value=Login>
+  <p><input type=submit value=Login></p>
 </form>
-</body>
-</html>
+<a class="btn btn-primary" href="/register" role="button">Register</a>
+{% endblock %}

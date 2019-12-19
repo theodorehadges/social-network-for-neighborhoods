@@ -39,7 +39,7 @@ def index_page():
         return redirect("/feeds")
     lform = LoginForm(request.form)
     rform = RegistrationForm(request.form)
-    return render_template("register_login.html", lform=lform, rform=rform)
+    return render_template("login.html", lform=lform, rform=rform)
 
 
 @app.route('/feeds')
@@ -141,7 +141,7 @@ def register():
         password = form.password.data
         bcrypt_hash = bcrypt.generate_password_hash(password=password)
         try:
-            print(bcrypt_hash)
+            insert_user(form, bcrypt_hash)
             user = User(username=form.username.data, password=bcrypt_hash)
             db.session.add(user)
             db.session.commit()

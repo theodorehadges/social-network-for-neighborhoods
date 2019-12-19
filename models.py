@@ -236,3 +236,39 @@ def update_request_friends(cu_id, user_1_id, approved):
         {"approved": approved, "user_1_id": user_1_id, "cu_id": cu_id}
     )
     db.session.commit()
+
+def get_all_friends(cu_id):
+    users = db.session.execute(
+          """with uf as (select coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
+        from friend
+        where user_1_id = :cu_id
+        or user_2_id = :cu_id)
+        select u.id, u.username, u.firstname, u.lastname
+        from uf inner join userm u on uf.uf_id = u.id""",
+          {"cu_id": cu_id}
+    )
+    return users
+
+
+def insert_user(reg_form, bcrypt_hash):
+    username = reg_form.username.data
+    firstname = reg_form.firstname.data
+    lastname = reg_form.lastname.data
+    email = reg_form.email.data
+    street = reg_form.street.data
+    city = reg_form.city.data
+    zipcode = reg_form.zipcode.data
+    state = reg_form.state.data
+    lat = reg_form.lat.data
+    long = reg_form.long.data
+    password = bcrypt_hash
+    db.session.execute(
+        """
+        insert into userm(username, password, firstname, lastname, email, street, city, state, zipcode, lat, long, created_on) 
+        values(:username, :password, :firstname, :lastname, :email, :street, :city, :state, :zipcode, 22, 33, now())
+        """,
+        {"username": username, "password": password,
+         "firstname": password, "lastname": lastname, "email": email,
+         "street": street, "city": city, "state": state, "zipcode": zipcode, "lat": lat,
+         "long": long}
+    )

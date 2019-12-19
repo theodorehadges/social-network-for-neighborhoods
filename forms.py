@@ -4,13 +4,21 @@ from wtforms import BooleanField, StringField, PasswordField, validators, TextAr
 
 class LoginForm(FlaskForm):
     username = StringField('Username', id="luname", validators=[validators.Length(min=4, max=25), validators.DataRequired()])
-    password = PasswordField('New Password', id="lpword", validators= [validators.DataRequired()])
+    password = PasswordField('Password', id="lpword", validators= [validators.DataRequired()])
 
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', id="runame", validators=[validators.Length(min=4, max=25), validators.DataRequired()])
     password = PasswordField('New Password', id="rpword", validators=[validators.DataRequired()])
-
+    firstname = StringField('First Name', id="rfname")
+    lastname = StringField('Last Name', id="rlname")
+    email = StringField("Email", id="email")
+    street = StringField("Street", id="street")
+    city = StringField("City", id="city")
+    zipcode = StringField("Zipcode", id="zipcode")
+    state = StringField("State", id="state")
+    lat = HiddenField(id="lat")
+    long = HiddenField(id="long")
 
 class ThreadForm(FlaskForm):
     title = StringField("Title", id="title", validators=[validators.DataRequired()])
