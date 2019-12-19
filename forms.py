@@ -17,8 +17,7 @@ class RegistrationForm(FlaskForm):
     city = StringField("City", id="city")
     zipcode = StringField("Zipcode", id="zipcode")
     state = StringField("State", id="state")
-    lat = HiddenField(id="lat")
-    long = HiddenField(id="long")
+    description = StringField("Bio", id="bio")
 
 class ThreadForm(FlaskForm):
     title = StringField("Title", id="title", validators=[validators.DataRequired()])
