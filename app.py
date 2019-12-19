@@ -45,9 +45,20 @@ def index_page():
 @app.route('/feeds')
 @login_required
 def feeds():
-    friend_thread = get_thread_friend_unread(current_user.id)
-    messages_by_thread = make_thread_message_into_thread(friend_thread)
-    return "yay"
+    current_user.id = 4 # for debugging
+    #friend_thread = get_thread_friend_unread(current_user.id)
+    #messages_by_thread = make_thread_message_into_thread(friend_thread)
+    friend_messages = get_recent_friend_messages(current_user.id)
+    neighbor_messages = get_recent_neighbor_messages(current_user.id)
+    neighborhood_messages = get_recent_neighbor_messages(current_user.id)
+    block_messages = get_recent_block_messages(current_user.id)
+    
+    return render_template("feeds.html", friend_messages=friend_messages,
+            neighbor_messages=neighbor_messages,
+            neighborhood_messages=neighborhood_messages,
+            block_messages=block_messages)
+
+    #return "yay"
 
 
 @app.route('/thread', methods=['GET', 'POST'])
@@ -93,11 +104,9 @@ def search():
         search_text = form.search_text.data
         search_results = search_threads(current_user.id, search_type, search_text)
         print(search_results)
-        return render_template("search_results.html", search_results=search_results)
+        return render_template("display_threads.html", threads=search_results)
     return render_template("search.html", tform=form)
    
-
-
 
 
 @app.route('/possible_friends', methods=['GET', 'POST'])
@@ -172,6 +181,7 @@ def validate_user(username, password):
     if found_user:
         return bcrypt.check_password_hash(found_user.password, password)
     return False
+
 
 
 @app.route("/logout")
