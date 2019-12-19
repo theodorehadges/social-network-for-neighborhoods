@@ -41,6 +41,18 @@ def index_page():
     rform = RegistrationForm(request.form)
     return render_template("login.html", lform=lform, rform=rform)
 
+@app.route('/profile/<int:profile_id>')
+@login_required
+def profile_page(profile_id):
+    # show about
+    # show friends on map
+    # show neighbors on map
+    friends = get_all_friends(profile_id) # Change param to curent_user.id 
+    #neighbors = get_all_neighbors(current_user.id)
+    userprofile = get_profile_info_from_uid(profile_id) 
+   
+    return render_template("profile.html", friends=friends, userprofile=userprofile)
+
 
 @app.route('/feeds')
 @login_required

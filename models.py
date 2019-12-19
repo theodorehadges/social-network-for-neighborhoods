@@ -23,6 +23,16 @@ def get_thread_friend_unread(uid):
     )
     return rows
 
+def get_profile_info_from_uid(uid):
+    record = db.session.execute(
+        """select u.firstname, u.lastname, p.description, p.photo, u.lat, u.long 
+        from userm u, profile p
+        where u.id = p.id
+        and u.id = :uid;""",
+        {'uid': uid}
+    ).fetchone()
+    return record
+
 
 def make_thread(uid, title, body):
     thread = db.session.execute(
@@ -295,16 +305,30 @@ def update_request_friends(cu_id, user_1_id, approved):
     db.session.commit()
 
 def get_all_friends(cu_id):
-    users = db.session.execute(
+    friends = db.session.execute(
           """with uf as (select coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
         from friend
         where user_1_id = :cu_id
         or user_2_id = :cu_id)
-        select u.id, u.username, u.firstname, u.lastname
+        select u.id, u.username, u.firstname, u.lastname, u.lat, u.long
         from uf inner join userm u on uf.uf_id = u.id""",
           {"cu_id": cu_id}
     )
-    return users
+    return friends 
+
+def get_all_neighbors(cu_id):
+    neighbors = db.session.execute(
+        """with uf as (select coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
+        from neighbor
+        where user_1_id = :cu_id
+        or user_2_id = :cu_id)
+        select u.id, u.username, u.firstname, u.lastname, u.lat, u.long
+        from uf inner join userm u on uf.uf_id = u.id""",
+            {"cu_id": cu_id}
+    )
+    return neighbors
+
+
 
 
 def insert_user(reg_form, bcrypt_hash):
