@@ -419,8 +419,15 @@ def insert_into_block_apply(cu_id, block_id):
     db.session.commit()
 
 
-def insert_into_neighbors(cu_id, block_id):
-    pass
+def insert_into_neighbors(cu_id, friend_id):
+    db.session.execute(
+        """
+        insert into neighbor(user_1_id, user_2_id) 
+values(:cu_id, :friend_id)
+        """,
+        {"cu_id": cu_id, "friend_id": friend_id}
+    )
+    db.session.commit()
 
 
 def get_all_neighbors(cu_id):

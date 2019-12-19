@@ -147,6 +147,17 @@ def pending_friends():
     return render_template("pending_friends.html", form=form, users=pfriends)
 
 
+@app.route('/possible_neighbors', methods=['GET', 'POST'])
+@login_required
+def possible_neighbors():
+    form = FriendRequestForm(request.form)
+    users = get_user_list(current_user.id)
+    if form.validate_on_submit():
+        friend_id = form.request_id.data
+        insert_into_neighbors(current_user.id, friend_id)
+        return redirect("feeds")
+    return render_template("possible_friends.html", form=form, users=users)
+
 @app.route('/friends')
 @login_required
 def get_friends():
@@ -197,7 +208,9 @@ def validate_user(username, password):
 def blocks():
     neighborhood_id = request.args.get('n_ida')
     blocks = get_blocks(neighborhood_id)
-    block_list = [[str(id), name] for id, name in blocks] block_dict = {"blocks": block_list} return jsonify(block_dict)
+    block_list = [[str(id), name] for id, name in blocks]
+    block_dict = {"blocks": block_list}
+    return jsonify(block_dict)
 
 
 @app.route('/neighborhood', methods=['GET', 'POST'])
