@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+{% for user in users %}
+  <a href="/profile/{{user[0]}}">{{user[1]}}, {{user[2]}},{{user[3]}}</a>
+{% endfor %}
+{% endblock %}

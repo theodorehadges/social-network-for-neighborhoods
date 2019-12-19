@@ -188,13 +188,68 @@ def search_threads(uid, search_type, search_text):
 
 def get_messages_by_thread_id(thread_id):
     messages = db.session.execute(
-        """select distinct tm.thread_id, tm.id, tm.title, tm.author, tm.body
-        from thread_message tm
-        where tm.thread_id = :ti""",
+        """select distinct tm.id, u.username, tm.title, tm.body
+        from thread_message tm inner join userm u on tm.author = u.id
+        where tm.thread_id = :ti
+        order by tm.id asc""",
         {"ti": thread_id}
     )
     return messages
 
+
+def insert_message_reply(thread_id, cu_id, title, body):
+    message = db.session.execute(
+            """with rows as (insert into thread_message(thread_id, author, created_time, title, body, lat, long)
+            values(:thread_id, :cu_id, now(), :title, :body, NULL, NULL
+            ) RETURNING id)
+            select id from rows;
+            """,
+        {"thread_id": thread_id, "cu_id": cu_id, "title": title, "body": body}).fetchone()
+    db.session.commit()
+    return message[0]
+
+
+def insert_message_read(message_id, thread_id, cu_id):
+    db.session.execute(
+        """
+        insert into message_read(message_id, thread_id, user_id)
+        (select :message_id, :thread_id, friend_id as uid
+from thread_friend tf
+where tf.thread_id = :thread_id)
+union
+--neighbor
+(select :message_id, :thread_id,  tn.neighbor_id as uid
+from thread_neighbor tn
+where tn.thread_id = :thread_id
+)
+union
+--neighborhood
+(select :message_id, :thread_id, u.id as uid
+from thread_block tb inner join userm u on tb.block_id = u.block_id
+where tb.thread_id = :thread_id)
+union
+--block
+(select :message_id, :thread_id, u.id as uid
+from thread_neighborhood tnn inner join block b on tnn.neighborhood_id = b.neighborhood_id
+inner join userm u on b.id = u.block_id
+where tnn.thread_id = :thread_id)
+        """,
+        {"thread_id": int(thread_id), "message_id": message_id}
+    )
+    db.session.commit()
+
+
+def update_message_read(message_id, thread_id, cu_id):
+    db.session.execute(
+        """
+        update message_read
+        set read = TRUE 
+        where thread_id = :thread_id
+        and message_id = :message_id
+        and user_id = :cu_id
+        """,
+        {"thread_id": int(thread_id), "message_id": message_id, "cu_id": cu_id}
+    )
 
 def get_user_list(cu_id):
     users = db.session.execute(
