@@ -8,7 +8,7 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', id="runame",validators=[validators.Length(min=4, max=25), validators.DataRequired()])
+    username = StringField('Username', id="runame", validators=[validators.Length(min=4, max=25), validators.DataRequired()])
     password = PasswordField('New Password', id="rpword", validators=[validators.DataRequired()])
 
 
@@ -27,3 +27,9 @@ class FriendAcceptForm(FlaskForm):
 class FriendRequestForm(FlaskForm):
     request_id = HiddenField()
     request_invite = SubmitField('Invite')
+
+
+class MessageForm(FlaskForm):
+    thread_id = HiddenField()
+    title = StringField("Title", id="title", validators=[validators.DataRequired()])
+    body = StringField("Message", id="message", validators=[validators.DataRequired()])

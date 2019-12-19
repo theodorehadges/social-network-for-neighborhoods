@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+{% for message in messages %}
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{message[2]}}</h5>
+    <h6 class="card-subtitle mb-2 text-muted">author: {{message[1]}}</h6>
+    <p class="card-text">{{message[3]}}</p>
+  </div>
+</div>
+{% endfor %}
+<form action="/message/reply" method=post>
+    {{ form.csrf_token() }}
+        {{ form.thread_id(id=thread_id, value=thread_id) }}
+  <div class="form-group">
+    {{ form.title() }}
+  </div>
+  <div class="form-group">
+    {{ form.body() }}
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock %}

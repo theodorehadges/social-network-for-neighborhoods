@@ -10,7 +10,7 @@ from flask import Flask, redirect, request, flash, render_template
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 
-from forms import RegistrationForm, LoginForm, ThreadForm, FriendRequestForm, FriendAcceptForm
+from forms import RegistrationForm, LoginForm, ThreadForm, FriendRequestForm, FriendAcceptForm, MessageForm
 from models import *
 from util import make_thread_message_into_thread
 
@@ -67,11 +67,23 @@ def thread():
 @app.route('/thread/<int:thread_id>')
 @login_required
 def get_thread(thread_id):
-    #messages = get_messages_by_thread_id(thread_id)
-    messages = get_messages_by_thread_id(2)
+    form = MessageForm()
+    messages = get_messages_by_thread_id(thread_id)
+    return render_template("thread_message.html", form=form, messages=messages, thread_id=thread_id)
 
-    print(messages)
-    return "yay"
+
+@app.route('/message/reply', methods=['POST'])
+@login_required
+def message_reply():
+    form = MessageForm(request.form)
+    if form.validate_on_submit():
+        thread_id = form.thread_id.data
+        title = form.title.data
+        message = form.body.data
+        message_id = insert_message_reply(thread_id, current_user.id, title, message)
+        insert_message_read(message_id, thread_id, current_user.id)
+        update_message_read(message_id, thread_id, current_user.id)
+        return redirect('/thread/{}'.format(thread_id))
 
 
 @app.route('/possible_friends', methods=['GET', 'POST'])
@@ -99,6 +111,14 @@ def pending_friends():
             update_request_friends(current_user.id, r_id, False)
         return redirect('friends')
     return render_template("pending_friends.html", form=form, users=pfriends)
+
+
+@app.route('/friends')
+@login_required
+def get_friends():
+    users = get_all_friends(current_user.id)
+    return render_template("friends.html", users=users)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

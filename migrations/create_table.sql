@@ -46,7 +46,7 @@ create table thread_block(id serial primary key, thread_id int references thread
     block_id int references block(id) not null);
 create table thread_neighborhood(id serial primary key, thread_id int references thread(id) not null,
     neighborhood_id int references neighborhood(id) not null);
-create table message_read(id serial primary key, message_id int references thread_message(id) not null,
-    user_id int references userm(id) not null, read bool);
+create table message_read(id serial primary key, thread_id int references thread(id) not null,
+message_id int references thread_message(id) not null, user_id int references userm(id) not null, read bool);
 create table user_log(id serial primary key, user_id int references userm(id) not null, login_time timestamp);
 
