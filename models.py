@@ -74,6 +74,63 @@ block_query = "(select tm.thread_id, tm.title \
             and (tm.body ilike :search_text  \
             or tm.title ilike :search_text))"
 
+def get_recent_friend_messages(uid):
+    rows = db.session.execute(
+        """select distinct tf.thread_id, tm.title, tm.created_time
+        from userm u inner join friend f on u.id = f.user_1_id or u.id = f.user_2_id
+        inner join thread_friend tf on f.id = tf.friend_id
+        inner join thread_message tm on tf.thread_id = tm.thread_id
+        where u.id = :uid
+        order by tm.created_time desc
+        limit 2""",
+        {'uid': uid}
+    )
+    return rows
+
+def get_recent_neighbor_messages(uid):
+    rows = db.session.execute(
+        """select tm.thread_id, tm.title, tm.created_time\
+        from userm u inner join neighbor n on u.id = n.user_1_id or u.id \
+        = n.user_2_id \
+        inner join thread_friend tf on n.id = tf.friend_id \
+        inner join thread_message tm on tf.thread_id = tm.thread_id \
+        where u.id = 4 \
+        order by tm.created_time desc
+        limit 2""" ,
+        {'uid': uid}
+    )
+    return rows
+
+def get_recent_neighborhood_messages(uid):
+    rows = db.session.execute(
+        """select tm.thread_id, tm.title, tm.created_time \
+        from userm u inner join block b on u.block_id = b.id \
+        inner join neighborhood nh on b.neighborhood_id = nh.id \
+        inner join thread_neighborhood tnh on nh.id = tnh.neighborhood_id \
+        inner join thread_message tm on tm.thread_id =tnh.thread_id \
+        where u.id = 4 \
+        order by tm.created_time desc
+        limit 2""",
+        {'uid': uid}
+    )
+    return rows
+
+def get_recent_block_messages(uid):
+    rows = db.session.execute(
+        """select tm.thread_id, tm.title, tm.created_time \
+        from userm u inner join thread_block tb \
+        on u.block_id = tb.block_id \
+        inner join thread_message tm on tm.thread_id = tb.thread_id \
+        where u.id = 4 \
+        order by tm.created_time desc \
+        limit 2""",
+        {'uid': uid}
+    )
+    return rows
+
+
+
+
 
 # TODO: add case when no results found
 def search_threads(uid, search_type, search_text):

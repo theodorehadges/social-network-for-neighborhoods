@@ -1,20 +1,28 @@
 {% extends "layout.html" %}
-{% block title %}Index{% endblock %}
 {% block head %}
   {{ super() }}
 {% endblock %}
 {% block content %}
-<p>
-  <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-    Link with href
-  </a>
-  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-    Button with data-target
-  </button>
-</p>
-<div class="collapse" id="collapseExample">
-  <div class="card card-body">
-    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
-  </div>
-</div>
+{% from "_formhelpers.html" import render_field %}
+<h1>Recent Friend Messages</h1>
+{% for friend_message in friend_messages %}
+<p><a href="/thread/{{friend_message[0]}}">{{ friend_message[1] }}</a></p>
+{% endfor %}
+
+<h1>Recent Block Messages</h1>
+{% for block_message in block_messages %}
+<p><a href="/thread/{{block_message[0]}}">{{ block_message[1] }}</a></p>
+{% endfor %}
+
+<h1>Recent Neighbor Messages</h1>
+{% for neighbor_message in neighbor_messages %}
+<p><a href="/thread/{{neighbor_message[0]}}">{{ neighbor_message[1] }}</a></p>
+{% endfor %}
+
+<h1>Recent Neighborhood Messages</h1>
+{% for neighborhood_message in neighborhood_messages %}
+<p><a href="/thread/{{neighborhood_message[0]}}">{{ neighborhood_message[1] }}</a></p>
+{% endfor %}
+
+
 {% endblock %}
