@@ -44,7 +44,7 @@ friend_query = "(select tm.thread_id, tm.title \
             = f.user_2_id \
             inner join thread_friend tf on f.id = tf.friend_id \
             inner join thread_message tm on tf.thread_id = tm.thread_id \
-            where u.id = 4 \
+            where u.id = :uid \
             and (tm.body ilike :search_text \
             or tm.title ilike :search_text))"
 
@@ -53,7 +53,7 @@ neighbor_query = "(select tm.thread_id, tm.title \
             = n.user_2_id \
             inner join thread_friend tf on n.id = tf.friend_id \
             inner join thread_message tm on tf.thread_id = tm.thread_id \
-            where u.id = 4 \
+            where u.id = :uid \
             and (tm.body ilike :search_text  \
             or tm.title ilike :search_text))" 
 
@@ -62,7 +62,7 @@ neighborhood_query = "(select tm.thread_id, tm.title \
             inner join neighborhood nh on b.neighborhood_id = nh.id \
             inner join thread_neighborhood tnh on nh.id = tnh.neighborhood_id \
             inner join thread_message tm on tm.thread_id =tnh.thread_id \
-            where u.id = 4 \
+            where u.id = :uid \
             and (tm.body ilike :search_text  \
             or tm.title ilike :search_text))"
 
@@ -70,7 +70,7 @@ block_query = "(select tm.thread_id, tm.title \
             from userm u inner join thread_block tb \
             on u.block_id = tb.block_id \
             inner join thread_message tm on tm.thread_id =tb.thread_id \
-            where u.id = 4 \
+            where u.id = :uid \
             and (tm.body ilike :search_text  \
             or tm.title ilike :search_text))"
 
@@ -94,7 +94,7 @@ def get_recent_neighbor_messages(uid):
         = n.user_2_id \
         inner join thread_friend tf on n.id = tf.friend_id \
         inner join thread_message tm on tf.thread_id = tm.thread_id \
-        where u.id = 4 \
+        where u.id = :uid \
         order by tm.created_time desc
         limit 2""" ,
         {'uid': uid}
@@ -108,7 +108,7 @@ def get_recent_neighborhood_messages(uid):
         inner join neighborhood nh on b.neighborhood_id = nh.id \
         inner join thread_neighborhood tnh on nh.id = tnh.neighborhood_id \
         inner join thread_message tm on tm.thread_id =tnh.thread_id \
-        where u.id = 4 \
+        where u.id = :uid \
         order by tm.created_time desc
         limit 2""",
         {'uid': uid}
@@ -121,7 +121,7 @@ def get_recent_block_messages(uid):
         from userm u inner join thread_block tb \
         on u.block_id = tb.block_id \
         inner join thread_message tm on tm.thread_id = tb.thread_id \
-        where u.id = 4 \
+        where u.id = :uid \
         order by tm.created_time desc \
         limit 2""",
         {'uid': uid}
