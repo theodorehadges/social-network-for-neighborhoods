@@ -197,9 +197,7 @@ def validate_user(username, password):
 def blocks():
     neighborhood_id = request.args.get('n_ida')
     blocks = get_blocks(neighborhood_id)
-    block_list = [[str(id), name] for id, name in blocks]
-    block_dict = {"blocks": block_list}
-    return jsonify(block_dict)
+    block_list = [[str(id), name] for id, name in blocks] block_dict = {"blocks": block_list} return jsonify(block_dict)
 
 
 @app.route('/neighborhood', methods=['GET', 'POST'])
