@@ -39,8 +39,7 @@ def index_page():
     if current_user.is_authenticated:
         return redirect("/feeds")
     lform = LoginForm(request.form)
-    rform = RegistrationForm(request.form)
-    return render_template("login.html", lform=lform, rform=rform)
+    return render_template("login.html", lform=lform)
 
 
 @app.route('/feeds')
@@ -162,16 +161,16 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm(request.form)
-    if request.method == 'POST' and form.validate():
-        username = form.username.data
-        password = form.password.data
+    lform = LoginForm(request.form)
+    if request.method == 'POST' and lform.validate():
+        username = lform.username.data
+        password = lform.password.data
         if validate_user(username, password):
             found_user = User.query.filter_by(username=username).first()
             flask_login.login_user(found_user)
             return redirect('/feeds')
         return '<div id="result">Incorrect</div>'
-    return render_template('login.html', form=form)
+    return render_template('login.html', lform=lform)
 
 
 def validate_user(username, password):
@@ -214,6 +213,20 @@ def neighborhood():
             update_block_on_uid(current_user.id, block_id)
         return redirect("/feeds")
     return render_template("neighborhood.html", form=form)
+
+@app.route('/pending_block_approval', methods=['GET', 'POST'])
+@login_required
+def pending_block_approval():
+    form = FriendAcceptForm(request.form)
+    pneighbor = get_pending_block_approvals(current_user.id)
+    if form.validate_on_submit():
+        r_id = form.request_id.data
+        if form.request_accept.data:
+            update_block_approval(current_user.block_id, r_id, current_user.id, True)
+        else:
+            update_block_approval(current_user.block_id, r_id, current_user.id, False)
+        return redirect('feeds')
+    return render_template("pending_friends.html", form=form, users=pneighbor)
 
 
 @app.route("/logout")

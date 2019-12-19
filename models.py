@@ -8,6 +8,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(255), unique=True)
     password = db.Column(db.LargeBinary())
     email = db.column(db.String(255))
+    block_id = db.Column(db.Integer)
 
 
 def get_thread_friend_unread(uid):
@@ -432,5 +433,30 @@ def update_block_on_uid(cu_id, block_id):
         where id = :cu_id
         """,
         {"cu_id": cu_id, "block_id": block_id}
+    )
+    db.session.commit()
+
+
+def get_pending_block_approvals(cu_id):
+    users = db.session.execute(
+        """select ba.pending_user, u.username, u.firstname, u.lastname
+        from block_apply as ba inner join userm as u on ba.pending_user = u.id 
+        where ba.need_approval_by = :cu_id
+        and ba.given_approval is NULL""",
+        {"cu_id": cu_id}
+    )
+    return users
+
+
+def update_block_approval(block_id, pending_id, cu_id, approval):
+    db.session.execute(
+        """
+        update block_apply
+        set given_approval = :approval
+        where block_id = :block_id
+        and pending_user = :pending_id
+        and need_approval_by = :cu_id
+        """,
+        {"block_id": block_id, "pending_id": pending_id, "cu_id": cu_id, "approval": approval}
     )
     db.session.commit()
