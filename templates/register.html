@@ -22,10 +22,10 @@
 </form>
 <style type="text/css">
      #map {
-        width: 300px;
-        height: 300px;
-         left: 400px;
-         bottom: 600px
+        width: 500px;
+        height: 500px;
+         left: 500px;
+         bottom: 500px
       }
     </style>
     <div id="map"></div>
@@ -33,17 +33,38 @@
       var map;
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          zoom: 8
+          center: {lat: 40.7126588, lng: -74.0141567},
+          zoom: 12
         });
         google.maps.event.addListener(map,'click',function(event) {
     console.info(event.latLng.lat());  // print lat of click pos
     console.info(event.latLng.lng());  // print lng of click pos
+
+    getReverseGeocodingData(event.latLng.lat(), event.latLng.lng());
     });
       }
 
+
+    function getReverseGeocodingData(lat, lng) {
+        var latlng = new google.maps.LatLng(lat, lng);
+        // This is making the Geocode request
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+            if (status !== google.maps.GeocoderStatus.OK) {
+                alert(status);
+            }
+            // This is checking to see if the Geoeode Status is OK before proceeding
+            if (status == google.maps.GeocoderStatus.OK) {
+                console.log(results);
+                var address = (results[0].formatted_address);
+              window.alert(address)
+            }
+        });
+    }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOU_API_KEY_HERE&callback=initMap"
-    async defer></script>
+    <script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false"></script>
+    <script
+         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ9FKI0IjDZJJK5vEyDb_Temr3QyZLfVs&callback=initMap"
+             async defer></script>
 
 {% endblock %}
