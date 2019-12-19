@@ -7,14 +7,11 @@
 <h1>{{ userprofile[0] }} {{userprofile[1] }}</h1>
 <h3>Bio</h3>
 <p>{{ userprofile[2] }}</p>
-<div id = friendlist">
-
-  
-<ul>
-
 <h4>Friends</h4>
+<div id = friendlist">
+<ul>
 {% for friend in friends %}
-<li id={{ friend[0] }} lat={{ friend[4] }} lon={{ friend[5] }}>{{ friend[2] }}
+<li id={{ friend[0] }} uname={{ friend[2] }} class=list lat={{ friend[4] }} lng={{ friend[5] }}>{{ friend[2] }}
   {{ friend[3] }}</li>
 {% endfor %}
 </ul>
@@ -35,33 +32,34 @@
           center: {lat: 40.7126588, lng: -74.0141567},
           zoom: 12
         });
-        /*
-        $('friend-list').each(function(i) {
-          $(this).attr('lat');
-          console.info($(this).attr('lat'));
-
-
-        })
-        */
-        var marker = new google.maps.Marker({
-              position: {lat: 40.7126588, lng: -74.0141567},
-              title:"Elaine's House"
+        $(".list").each(function() {
+          var some_title;
+          var lat_dict = {};
+            $.each(this.attributes, function() {
+            // this.attributes is not a plain object, but an array
+            // of attribute nodes, which contain both the name and value
+            if(this.specified) {
+                if (this.name === "lat" || this.name === "lng") {
+                    lat_dict[this.name] = parseFloat(this.value);
+                }
+                if (this.name === "uname") {
+                    some_title = this.value;
+                }
+            }
+          })
+            console.log(lat_dict);
+           var marker = new google.maps.Marker({
+               position: lat_dict,
+              title: some_title
+            });
+            marker.setMap(map);
         });
-        marker.setMap(map);
         google.maps.event.addListener(map,'click',function(event) {
         console.info(event.latLng.lat());  // print lat of click pos
         console.info(event.latLng.lng());  // print lng of click pos
 
         const friend_array = Array.from(document.querySelectorAll('#friendlist>ul>li'));
         console.log("Get first: ", friend_array[0].textContent);
-
-        /*
-        console.log("Iterate with for...of:");
-        for (const li of document.querySelectorAll('#friendlist>ul>li')) {
-              console.log(li.textContent);
-        }
-        */
-
     });
       }
 
