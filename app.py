@@ -8,9 +8,7 @@ from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, redirect, request, flash, render_template
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-
-
-from forms import RegistrationForm, LoginForm, ThreadForm, FriendRequestForm, FriendAcceptForm, MessageForm
+from forms import RegistrationForm, LoginForm, ThreadForm, FriendRequestForm, FriendAcceptForm, SearchForm, MessageForm
 from models import *
 from util import make_thread_message_into_thread
 
@@ -84,6 +82,22 @@ def message_reply():
         insert_message_read(message_id, thread_id, current_user.id)
         update_message_read(message_id, thread_id, current_user.id)
         return redirect('/thread/{}'.format(thread_id))
+
+@app.route('/thread/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    form = SearchForm(request.form)
+
+    if form.validate_on_submit():
+        search_type = form.search_type.data
+        search_text = form.search_text.data
+        search_results = search_threads(current_user.id, search_type, search_text)
+        print(search_results)
+        return render_template("search_results.html", search_results=search_results)
+    return render_template("search.html", tform=form)
+   
+
+
 
 
 @app.route('/possible_friends', methods=['GET', 'POST'])
