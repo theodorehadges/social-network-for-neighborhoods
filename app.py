@@ -6,9 +6,10 @@ import flask_login
 import sqlalchemy
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, redirect, request, flash, render_template
+from flask import Flask, redirect, request, flash, render_template, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from forms import RegistrationForm, LoginForm, ThreadForm, FriendRequestForm, FriendAcceptForm, SearchForm, MessageForm
+from forms import RegistrationForm, LoginForm, ThreadForm, FriendRequestForm, FriendAcceptForm, SearchForm, MessageForm, \
+    Neighborhood
 from models import *
 from util import make_thread_message_into_thread
 
@@ -57,7 +58,6 @@ def feeds():
             neighborhood_messages=neighborhood_messages,
             block_messages=block_messages)
 
-    #return "yay"
 
 
 @app.route('/thread', methods=['GET', 'POST'])
@@ -67,7 +67,8 @@ def thread():
     if form.validate_on_submit():
         title = form.title.data
         body = form.body.data
-        thread_id = make_thread(current_user.id, title, body)
+        type = form.search_type.data
+        thread_id = make_thread(current_user.id, title, body, type)
         return redirect("/thread/{}".format(thread_id))
     return render_template("thread.html", tform=form)
 
@@ -150,14 +151,12 @@ def register():
         bcrypt_hash = bcrypt.generate_password_hash(password=password)
         try:
             insert_user(form, bcrypt_hash)
-            user = User(username=form.username.data, password=bcrypt_hash)
-            db.session.add(user)
-            db.session.commit()
-            flask_login.login_user(user)
+            found_user = User.query.filter_by(username=form.username.data).first()
+            flask_login.login_user(found_user)
         except sqlalchemy.exc.IntegrityError as e:
             print(e)
             return '<div id="success">failure</div>'
-        return redirect('/feeds')
+        return redirect('/neighborhood')
     return render_template('register.html', form=form)
 
 
@@ -181,6 +180,40 @@ def validate_user(username, password):
         return bcrypt.check_password_hash(found_user.password, password)
     return False
 
+
+@app.route('/block')
+@login_required
+def blocks():
+    neighborhood_id = request.args.get('n_ida')
+    blocks = get_blocks(neighborhood_id)
+    block_list = [[str(id), name] for id, name in blocks]
+    block_dict = {"blocks": block_list}
+    return jsonify(block_dict)
+
+
+@app.route('/neighborhood', methods=['GET', 'POST'])
+@login_required
+def neighborhood():
+    form = Neighborhood(request.form)
+    neighborhoods = get_neighborhoods()
+    neighbor_list = [(id, name) for id, name in neighborhoods]
+    blocks = get_blocks(neighbor_list[0][0])
+    block_list = [(id, name) for id, name in blocks]
+    form.neighborhood_type.choices = neighbor_list
+    form.block_type.choices = block_list
+    # need to skip validating because we change form values on front end
+    if flask.request.method == 'POST':
+        block_id = form.block_type.data
+        neighborhood_id = form.neighborhood_type.data
+        potential_neighbors = get_neighbors_from_block(current_user.id, block_id)
+        potential_neighbors_list = [x for x in potential_neighbors]
+        # if there are people in a block already insert into block apply otherwise auto insert into block
+        if potential_neighbors_list:
+            insert_into_block_apply(current_user.id, block_id)
+        else:
+            update_block_on_uid(current_user.id, block_id)
+        return redirect("/feeds")
+    return render_template("neighborhood.html", form=form)
 
 
 @app.route("/logout")

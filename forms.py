@@ -24,14 +24,13 @@ class ThreadForm(FlaskForm):
     title = StringField("Title", id="title", validators=[validators.DataRequired()])
     # Can you text area.
     body = StringField("Message", id="message", validators=[validators.DataRequired()])
-    search_type = SelectField("Search Type", choices = [("all",
-    "All Threads"), ("friends", "Friends"), ("neighbor", "Neighbor"), \
+    search_type = SelectField("Search Type", choices=[("friends", "Friends"), ("neighbor", "Neighbor"), \
             ("neighborhood", "Neighborhood"), ("block", "Block")], \
             validators=[validators.DataRequired()])
 
 class SearchForm(FlaskForm):
     #search_types = ["All threads, Friends, Neighborhood, Block"]
-    search_type = SelectField("Search Type", choices = [("all",
+    search_type = SelectField("Search Type", choices=[("all",
     "All Threads"), ("friends", "Friends"), ("neighbor", "Neighbor"), \
             ("neighborhood", "Neighborhood"), ("block", "Block")], \
             validators = [validators.DataRequired()])
@@ -50,6 +49,7 @@ class FriendAcceptForm(FlaskForm):
     request_accept = SubmitField('Accept')
     request_remove = SubmitField('Remove')
 
+
 class FriendRequestForm(FlaskForm):
     request_id = HiddenField()
     request_invite = SubmitField('Invite')
@@ -59,3 +59,8 @@ class MessageForm(FlaskForm):
     thread_id = HiddenField()
     title = StringField("Title", id="title", validators=[validators.DataRequired()])
     body = StringField("Message", id="message", validators=[validators.DataRequired()])
+
+
+class Neighborhood(FlaskForm):
+    neighborhood_type = SelectField("Neighborhood Type", coerce=int, id="neighborhoodid", choices=[], validators=[validators.DataRequired()])
+    block_type = SelectField("Block Type", id="blockid", coerce=int, choices=[], validators=[validators.DataRequired()])
