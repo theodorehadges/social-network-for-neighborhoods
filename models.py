@@ -149,11 +149,11 @@ def get_recent_friend_messages(uid):
 
 def get_recent_neighbor_messages(uid):
     rows = db.session.execute(
-        """select tm.thread_id, tm.title, tm.created_time\
+        """select distinct tm.thread_id, tm.title, tm.created_time\
         from userm u inner join neighbor n on u.id = n.user_1_id or u.id \
         = n.user_2_id \
-        inner join thread_friend tf on n.id = tf.friend_id \
-        inner join thread_message tm on tf.thread_id = tm.thread_id \
+        inner join thread_neighbor tn on n.id = tn.neighbor_id \
+        inner join thread_message tm on tn.thread_id = tm.thread_id \
         where u.id = :uid \
         order by tm.created_time desc
         limit 2""" ,
