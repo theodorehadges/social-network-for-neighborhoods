@@ -157,7 +157,7 @@ def possible_friends():
     if form.validate_on_submit():
         friend_id = form.request_id.data
         make_request_record(current_user.id, friend_id)
-        return redirect("feeds")
+        return redirect("possible_friends")
     return render_template("possible_friends.html", form=form, users=users, cu=current_user)
 
 
@@ -247,7 +247,7 @@ def blocks():
     return jsonify(block_dict)
 
 
-@app.route('/neighborhood', methods=['GET', 'POST'])
+@app.route('/blockapply', methods=['GET', 'POST'])
 @login_required
 def neighborhood():
     form = Neighborhood(request.form)
@@ -268,8 +268,8 @@ def neighborhood():
             insert_into_block_apply(current_user.id, block_id)
         else:
             update_block_on_uid(current_user.id, block_id)
-        return redirect("/feeds")
-    return render_template("neighborhood.html", form=form, cu=current_user)
+        return redirect("/possible_friends")
+    return render_template("blockapply.html", form=form, cu=current_user)
 
 
 @app.route('/pending_block_approval', methods=['GET', 'POST'])
