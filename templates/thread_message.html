@@ -9,7 +9,14 @@
   <div class="card-body">
     <h5 class="card-title">{{message[2]}}</h5>
     <h6 class="card-subtitle mb-2 text-muted">author: {{message[1]}}</h6>
+    <h6 class="card-subtitle mb-2 text-muted">date: {{message[4]}}</h6>
     <p class="card-text">{{message[3]}}</p>
+    {% if message[5] == false %}
+        <div class="alert alert-danger" role="alert">
+          UNREAD
+        </div>
+    {% endif %}
+
   </div>
 </div>
 {% endfor %}

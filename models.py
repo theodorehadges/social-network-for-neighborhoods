@@ -246,13 +246,15 @@ def search_threads(uid, search_type, search_text):
 
 
 
-def get_messages_by_thread_id(thread_id):
+def get_messages_by_thread_id(thread_id, cu_id):
     messages = db.session.execute(
-        """select distinct tm.id, u.username, tm.title, tm.body
+        """select distinct tm.id, u.username, tm.title, tm.body, tm.created_time, mr.read
         from thread_message tm inner join userm u on tm.author = u.id
+        inner join message_read mr on tm.id = mr.message_id and tm.thread_id = mr.thread_id
         where tm.thread_id = :ti
-        order by tm.id asc""",
-        {"ti": thread_id}
+        and mr.user_id = :cu_id
+        order by tm.id asc;""",
+        {"ti": thread_id, "cu_id": cu_id}
     )
     return messages
 
@@ -274,31 +276,31 @@ def insert_message_reply(thread_id, cu_id, title, body):
 def insert_message_read(message_id, thread_id, cu_id):
     db.session.execute(
         """
-        insert into message_read(message_id, thread_id, user_id)
-        ((select :message_id, :thread_id, user_1_id as uid
+        insert into message_read(message_id, thread_id, user_id, read)
+        ((select :message_id, :thread_id, user_1_id as uid, FALSE
 from thread_friend tf inner join friend f on tf.friend_id = f.id
 where tf.thread_id = :thread_id)
 union
-(select :message_id, :thread_id, user_2_id as uid
+(select :message_id, :thread_id, user_2_id as uid, FALSE
 from thread_friend tf inner join friend f on tf.friend_id = f.id
 where tf.thread_id = :thread_id))
 union
 --neighbor
-((select :message_id, :thread_id, user_1_id as uid
+((select :message_id, :thread_id, user_1_id as uid, FALSE
 from thread_neighbor tn inner join neighbor n on tn.neighbor_id = n.id
 where tn.thread_id = :thread_id)
 union
-(select :message_id, :thread_id, user_2_id as uid
+(select :message_id, :thread_id, user_2_id as uid, FALSE
 from thread_neighbor tn inner join neighbor n on tn.neighbor_id = n.id
 where tn.thread_id = :thread_id))
 union
 --neighborhood
-(select :message_id, :thread_id, u.id as uid
+(select :message_id, :thread_id, u.id as uid, FALSE
 from thread_block tb inner join userm u on tb.block_id = u.block_id
 where tb.thread_id = :thread_id)
 union
 --block
-(select :message_id, :thread_id, u.id as uid
+(select :message_id, :thread_id, u.id as uid, FALSE
 from thread_neighborhood tnn inner join block b on tnn.neighborhood_id = b.neighborhood_id
 inner join userm u on b.id = u.block_id
 where tnn.thread_id = :thread_id)
@@ -319,6 +321,7 @@ def update_message_read(message_id, thread_id, cu_id):
         """,
         {"thread_id": int(thread_id), "message_id": message_id, "cu_id": cu_id}
     )
+    db.session.commit()
 
 def get_user_list(cu_id):
     users = db.session.execute(

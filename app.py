@@ -119,8 +119,13 @@ def thread_neighbor():
 @login_required
 def get_thread(thread_id):
     form = MessageForm()
-    messages = get_messages_by_thread_id(thread_id)
-    return render_template("thread_message.html", form=form, messages=messages, thread_id=thread_id, cu=current_user)
+    message_list = []
+    messages = get_messages_by_thread_id(thread_id, current_user.id)
+    for message in messages:
+        message_list.append(message)
+        update_message_read(message[0], thread_id, current_user.id)
+    print(message_list)
+    return render_template("thread_message.html", form=form, messages=message_list, thread_id=thread_id, cu=current_user)
 
 
 @app.route('/message/reply', methods=['POST'])
