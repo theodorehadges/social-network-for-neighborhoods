@@ -23,7 +23,7 @@ class ThreadForm(FlaskForm):
     title = StringField("Title", id="title", validators=[validators.DataRequired()])
     # Can you text area.
     body = StringField("Message", id="message", validators=[validators.DataRequired()])
-    search_type = SelectField("Search Type", choices=[("friends", "Friends"), ("neighbor", "Neighbor"), \
+    search_type = SelectField("Recipients", choices=[("friends", "Friends"), ("neighbor", "Neighbor"), \
             ("neighborhood", "Neighborhood"), ("block", "Block")], \
             validators=[validators.DataRequired()])
 

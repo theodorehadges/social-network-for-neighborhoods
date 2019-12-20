@@ -39,18 +39,18 @@ select * from thread_message;
 from userm u inner join friend f on u.id = f.user_1_id or u.id = f.user_2_id
 inner join thread_friend tf on f.id = tf.friend_id
 inner join thread_message tm on tf.thread_id = tm.thread_id
-where u.id = 4
-and (tm.body ilike '%bicycle accident%'
-or tm.title ilike '%bicycle accident%'))
+where u.id = 1
+and (tm.body ilike '%msg%'
+or tm.title ilike '%msg%'))
 union
 --neighbor
 (select tm.id, tm.title, tm.body
 from userm u inner join neighbor n on u.id = n.user_1_id or u.id = n.user_2_id
 inner join thread_friend tf on n.id = tf.friend_id
 inner join thread_message tm on tf.thread_id = tm.thread_id
-where u.id = 4
-and (tm.body ilike '%bicycle accident%'
-or tm.title ilike '%bicycle accident%'))
+where u.id = 1
+and (tm.body ilike '%msg%'
+or tm.title ilike '%msg%'))
 union
 --neighborhood
 (select tm.id, tm.title, tm.body
@@ -58,19 +58,19 @@ from userm u inner join block b on u.block_id = b.id
 inner join neighborhood nh on b.neighborhood_id = nh.id
 inner join thread_neighborhood tnh on nh.id = tnh.neighborhood_id
 inner join thread_message tm on tm.thread_id =tnh.thread_id
-where u.id = 4
-and (tm.body ilike '%bicycle accident%'
-or tm.title ilike '%bicycle accident%'))
+where u.id = 1
+and (tm.body ilike '%msg%'
+or tm.title ilike '%msg%'))
 union
 --block
 (select tm.id, tm.title, tm.body
 from userm u inner join thread_block tb on u.block_id = tb.block_id
 inner join thread_message tm on tm.thread_id =tb.thread_id
-where u.id = 4
-and (tm.body ilike '%bicycle accident%'
-or tm.title ilike '%bicycle accident%'))
+where u.id = 1
+and (tm.body ilike '%msg%'
+or tm.title ilike '%msg%'))
 
-
+select * from thread_message;
 
 CREATE OR REPLACE FUNCTION check_friend_request_approval()
 RETURNS trigger AS

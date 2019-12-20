@@ -59,7 +59,7 @@ def insert_type_thread_query(thread_id, type, cu_id):
                     select :thread_id, block_id 
                     from userm u inner join block b on b.id = u.block_id
                     inner join neighborhood n on n.id = b.neighborhood_id 
-                    where id = :cu_id"""
+                    where u.id = :cu_id"""
     elif type == "neighbor":
         query = """insert into thread_neighbor(thread_id, neighbor_id) 
                     select :thread_id, coalesce(nullif(user_1_id, :cu_id), user_2_id) as n_id

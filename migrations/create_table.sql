@@ -50,3 +50,9 @@ create table message_read(id serial primary key, thread_id int references thread
 message_id int references thread_message(id) not null, user_id int references userm(id) not null, read bool);
 create table user_log(id serial primary key, user_id int references userm(id) not null, login_time timestamp);
 
+select * from friend_request;
+select * from thread_message;
+select * from block_apply;
+select * from userm;
+select * from thread_neighborhood_id_seq;
+select * from thread_neighborhood;
