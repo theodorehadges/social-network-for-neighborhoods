@@ -180,7 +180,7 @@ def pending_friends():
 @login_required
 def possible_neighbors():
     form = FriendRequestForm(request.form)
-    users = get_user_list(current_user.id)
+    users = get_user_list_minus_neighbors(current_user.id)
     if form.validate_on_submit():
         friend_id = form.request_id.data
         insert_into_neighbors(current_user.id, friend_id)

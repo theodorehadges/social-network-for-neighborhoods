@@ -323,6 +323,40 @@ def get_user_list(cu_id):
     return users
 
 
+def get_user_list_minus_neighbors(cu_id):
+    users = db.session.execute(
+        """(select id, username, firstname, lastname
+        from userm
+        where id != :cu_id)
+        except
+        (with uf as (select coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
+        from neighbor
+        where user_1_id = :cu_id
+        or user_2_id = :cu_id)
+        select u.id, u.username, u.firstname, u.lastname
+        from uf inner join userm u on uf.uf_id = u.id)""",
+        {"cu_id": cu_id}
+    )
+    return users
+
+
+def get_user_list_minus_friends(cu_id):
+    users = db.session.execute(
+        """(select id, username, firstname, lastname
+        from userm
+        where id != :cu_id)
+        except
+        (with uf as (select coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
+        from friend
+        where user_1_id = :cu_id
+        or user_2_id = :cu_id)
+        select u.id, u.username, u.firstname, u.lastname
+        from uf inner join userm u on uf.uf_id = u.id)""",
+        {"cu_id": cu_id}
+    )
+    return users
+
+
 def make_request_record(cu_id, friend_id):
     db.session.execute(
         """insert into friend_request(user_1_id, user_2_id,approved, created_on)
