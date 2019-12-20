@@ -47,9 +47,21 @@ def profile_page(profile_id):
     # show friends on map
     # show neighbors on map
     friends = get_all_friends(profile_id) # Change param to curent_user.id 
-    #neighbors = get_all_neighbors(current_user.id)
+    neighbors = get_all_neighbors_lat_long(profile_id)
+    users = []
+    for user in friends:
+        u_row = []
+        for row in user:
+            u_row.append(row)
+        users.append(tuple(u_row))
+    for user in neighbors:
+        u_row = []
+        for row in user:
+            u_row.append(row)
+        users.append(tuple(u_row))
+    users = list(set(users))
     userprofile = get_profile_info_from_uid(profile_id)
-    return render_template("profile.html", friends=friends, userprofile=userprofile, cu=current_user)
+    return render_template("profile.html", friends=users, userprofile=userprofile, cu=current_user)
 
 
 @app.route('/feeds')

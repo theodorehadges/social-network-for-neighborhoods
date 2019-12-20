@@ -529,6 +529,17 @@ def get_all_neighbors(cu_id):
     )
     return users
 
+def get_all_neighbors_lat_long(cu_id):
+    users = db.session.execute(
+          """with uf as (select coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
+        from neighbor
+        where user_1_id = :cu_id
+        or user_2_id = :cu_id)
+        select u.id, u.username, u.firstname, u.lastname, u.lat, u.long
+        from uf inner join userm u on uf.uf_id = u.id""",
+          {"cu_id": cu_id}
+    )
+    return users
 
 def get_neighbors_from_block(cu_id, block_id):
     users = db.session.execute(
