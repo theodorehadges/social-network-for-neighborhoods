@@ -60,7 +60,13 @@
             if (status == google.maps.GeocoderStatus.OK) {
                 console.log(results);
                 var address = (results[0].formatted_address);
-              window.alert(address)
+                var res = address.split(",");
+                console.log(res[2].trim().split(" ")[0])
+                $("#street").val(res[0].trim())
+                $("#city").val(res[1].trim())
+                $("#zipcode").val(res[2].trim().split(" ")[1])
+                $("#state").val(res[2].trim().split(" ")[0])
+              // window.alert(address)
             }
         });
     }
