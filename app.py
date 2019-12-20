@@ -208,8 +208,10 @@ def register():
             flask_login.login_user(found_user)
         except sqlalchemy.exc.IntegrityError as e:
             print(e)
+            logout_user()
             return '<div id="success">Registration unsuccessful. Please try \
-        a different username.</div>'
+        a different username. Redirecting back to Registration page...</div> \
+        <meta http-equiv="refresh" content="4;url=register" />'
         return redirect('/neighborhood')
     return render_template('register.html', form=form)
 

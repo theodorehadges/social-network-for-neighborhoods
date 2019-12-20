@@ -13,14 +13,14 @@ class LoginForm(FlaskForm):
 class RegistrationForm(FlaskForm):
     username = StringField('Username', id="runame", validators=[validators.Length(min=4, max=25), validators.DataRequired()])
     password = PasswordField('New Password', id="rpword", validators=[validators.DataRequired()])
-    firstname = StringField('First Name', id="rfname")
-    lastname = StringField('Last Name', id="rlname")
-    email = StringField("Email", id="email")
-    street = StringField("Street", id="street")
-    city = StringField("City", id="city")
-    zipcode = StringField("Zipcode", id="zipcode")
-    state = StringField("State", id="state")
-    description = StringField("Bio", id="bio")
+    firstname = StringField('First Name', id="rfname", validators=[validators.DataRequired()])
+    lastname = StringField('Last Name', id="rlname", validators=[validators.DataRequired()])
+    email = StringField("Email", id="email", validators=[validators.DataRequired()])
+    street = StringField("Street", id="street", validators=[validators.DataRequired()])
+    city = StringField("City", id="city", validators=[validators.DataRequired()])
+    zipcode = StringField("Zipcode", id="zipcode", validators=[validators.DataRequired()])
+    state = StringField("State", id="state", validators=[validators.DataRequired()])
+    description = StringField("Bio", id="bio", validators=[validators.DataRequired()])
 
 class ThreadForm(FlaskForm):
     title = StringField("Title", id="title", validators=[validators.DataRequired()])
