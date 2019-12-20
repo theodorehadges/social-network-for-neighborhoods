@@ -6,12 +6,12 @@ from wtforms.widgets import CheckboxInput, ListWidget
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', id="luname", validators=[validators.Length(min=4, max=25), validators.DataRequired()])
+    username = StringField('Username', id="luname", validators=[validators.DataRequired()])
     password = PasswordField('Password', id="lpword", validators= [validators.DataRequired()])
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', id="runame", validators=[validators.Length(min=4, max=25), validators.DataRequired()])
+    username = StringField('Username', id="runame", validators=[validators.DataRequired()])
     password = PasswordField('New Password', id="rpword", validators=[validators.DataRequired()])
     firstname = StringField('First Name', id="rfname", validators=[validators.DataRequired()])
     lastname = StringField('Last Name', id="rlname", validators=[validators.DataRequired()])

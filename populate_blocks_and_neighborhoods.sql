@@ -11,7 +11,7 @@ values('williamsbug'),
         ('harlem');
 
 select * from neighborhood;
-
+select * from block;
 insert into block(name, neighborhood_id)
 values('block11', 1),
        ('block21', 1),
