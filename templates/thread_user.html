@@ -6,11 +6,11 @@
 {% block content %}
 {% from "_formhelpers.html" import render_field %}
 <form  method=post>
-    {{ tform.hidden_tag() }}
+    {{ form.hidden_tag() }}
   <dl>
-    {{ render_field(tform.title) }}
-    {{ render_field(tform.body) }}
-    {{ render_field(tform.make_type) }}
+    {{ render_field(form.title) }}
+    {{ render_field(form.body) }}
+    {{ render_field(form.user_choice) }}
   </dl>
   <p><input type=submit value=Post></p>
 </form>
