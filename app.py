@@ -50,7 +50,7 @@ def profile_page(profile_id):
     #neighbors = get_all_neighbors(current_user.id)
     userprofile = get_profile_info_from_uid(profile_id) 
    
-    return render_template("profile.html", friends=friends, userprofile=userprofile)
+    return render_template("profile.html", friends=friends, userprofile=userprofile, cu=current_user)
 
 
 @app.route('/feeds')
@@ -66,7 +66,7 @@ def feeds():
     return render_template("feeds.html", friend_messages=friend_messages,
             neighbor_messages=neighbor_messages,
             neighborhood_messages=neighborhood_messages,
-            block_messages=block_messages)
+            block_messages=block_messages, cu=current_user)
 
 
 
@@ -80,7 +80,7 @@ def thread():
         type = form.make_type.data
         thread_id = make_thread(current_user.id, title, body, type, None)
         return redirect("/thread/{}".format(thread_id))
-    return render_template("thread.html", tform=form)
+    return render_template("thread.html", tform=form, cu=current_user)
 
 
 @app.route('/thread/friend', methods=['GET', 'POST'])
@@ -96,7 +96,7 @@ def thread_friend():
         uids = form.user_choice.data
         thread_id = make_thread(current_user.id, title, body, 'friend', uids)
         return redirect("/thread/{}".format(thread_id))
-    return render_template("thread_user.html", form=form)
+    return render_template("thread_user.html", form=form, cu=current_user)
 
 
 @app.route('/thread/neighbor', methods=['GET', 'POST'])
@@ -112,7 +112,7 @@ def thread_neighbor():
         uids = form.user_choice.data
         thread_id = make_thread(current_user.id, title, body, 'neighbor', uids)
         return redirect("/thread/{}".format(thread_id))
-    return render_template("thread_user.html", form=form)
+    return render_template("thread_user.html", form=form, cu=current_user)
 
 
 
@@ -121,7 +121,7 @@ def thread_neighbor():
 def get_thread(thread_id):
     form = MessageForm()
     messages = get_messages_by_thread_id(thread_id)
-    return render_template("thread_message.html", form=form, messages=messages, thread_id=thread_id)
+    return render_template("thread_message.html", form=form, messages=messages, thread_id=thread_id, cu=current_user)
 
 
 @app.route('/message/reply', methods=['POST'])
@@ -144,8 +144,8 @@ def search():
         search_type = form.search_type.data
         search_text = form.search_text.data
         search_results = search_threads(current_user.id, search_type, search_text)
-        return render_template("search_results.html", search_results=search_results)
-    return render_template("search.html", tform=form)
+        return render_template("search_results.html", search_results=search_results, cu=current_user)
+    return render_template("search.html", tform=form, cu=current_user)
    
 
 
@@ -158,7 +158,7 @@ def possible_friends():
         friend_id = form.request_id.data
         make_request_record(current_user.id, friend_id)
         return redirect("feeds")
-    return render_template("possible_friends.html", form=form, users=users)
+    return render_template("possible_friends.html", form=form, users=users, cu=current_user)
 
 
 @app.route('/pending_friends', methods=['GET', 'POST'])
@@ -173,7 +173,7 @@ def pending_friends():
         else:
             update_request_friends(current_user.id, r_id, False)
         return redirect('friends')
-    return render_template("pending_friends.html", form=form, users=pfriends)
+    return render_template("pending_friends.html", form=form, users=pfriends, cu=current_user)
 
 
 @app.route('/possible_neighbors', methods=['GET', 'POST'])
@@ -185,13 +185,13 @@ def possible_neighbors():
         friend_id = form.request_id.data
         insert_into_neighbors(current_user.id, friend_id)
         return redirect("feeds")
-    return render_template("possible_friends.html", form=form, users=users)
+    return render_template("possible_friends.html", form=form, users=users, cu=current_user)
 
 @app.route('/friends')
 @login_required
 def get_friends():
     users = get_all_friends(current_user.id)
-    return render_template("friends.html", users=users)
+    return render_template("friends.html", users=users, cu=current_user)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -267,7 +267,7 @@ def neighborhood():
         else:
             update_block_on_uid(current_user.id, block_id)
         return redirect("/feeds")
-    return render_template("neighborhood.html", form=form)
+    return render_template("neighborhood.html", form=form, cu=current_user)
 
 
 @app.route('/pending_block_approval', methods=['GET', 'POST'])
@@ -282,7 +282,7 @@ def pending_block_approval():
         else:
             update_block_approval(current_user.block_id, r_id, current_user.id, False)
         return redirect('feeds')
-    return render_template("pending_friends.html", form=form, users=pneighbor)
+    return render_template("pending_friends.html", form=form, users=pneighbor, cu=current_user)
 
 
 @app.route("/logout")
