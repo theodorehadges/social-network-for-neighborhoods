@@ -108,14 +108,14 @@ friend_query = "(select tm.thread_id, tm.title \
             and (tm.body ilike :search_text \
             or tm.title ilike :search_text))"
 
-neighbor_query = "(select tm.thread_id, tm.title \
-        from userm u inner join neighbor n on u.id = n.user_1_id or u.id \
-            = n.user_2_id \
-            inner join thread_friend tf on n.id = tf.friend_id \
-            inner join thread_message tm on tf.thread_id = tm.thread_id \
-            where u.id = :uid \
-            and (tm.body ilike :search_text  \
-            or tm.title ilike :search_text))" 
+neighbor_query = """(select tm.thread_id, tm.title 
+        from userm u inner join neighbor n on u.id = n.user_1_id or u.id 
+            = n.user_2_id 
+            inner join thread_neighbor tn on n.id = tn.neighbor_id 
+            inner join thread_message tm on tn.thread_id = tm.thread_id 
+            where u.id = :uid 
+            and (tm.body ilike :search_text  
+            or tm.title ilike :search_text))"""
 
 neighborhood_query = "(select tm.thread_id, tm.title \
             from userm u inner join block b on u.block_id = b.id \
@@ -234,7 +234,7 @@ def search_threads(uid, search_type, search_text):
             )
     else:
         return("no type specified. (shouldn't get here)")
-    return (result)
+    return result
 
 
 # note: redirect to thread
