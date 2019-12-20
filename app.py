@@ -60,7 +60,7 @@ def feeds():
     #messages_by_thread = make_thread_message_into_thread(friend_thread)
     friend_messages = get_recent_friend_messages(current_user.id)
     neighbor_messages = get_recent_neighbor_messages(current_user.id)
-    neighborhood_messages = get_recent_neighbor_messages(current_user.id)
+    neighborhood_messages = get_recent_neighborhood_messages(current_user.id)
     block_messages = get_recent_block_messages(current_user.id)
     
     return render_template("feeds.html", friend_messages=friend_messages,

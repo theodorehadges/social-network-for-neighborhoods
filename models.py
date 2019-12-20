@@ -69,7 +69,7 @@ def insert_type_thread_query(thread_id, type, cu_id, uids):
                     select :thread_id, neighborhood_id 
                     from userm u inner join block b on b.id = u.block_id
                     inner join neighborhood n on n.id = b.neighborhood_id 
-                    where id = :cu_id"""
+                    where u.id = :cu_id"""
         db.session.execute(query, {"thread_id": thread_id, "cu_id": cu_id, "uid": uids})
         db.session.commit()
     elif type == "neighbor":
