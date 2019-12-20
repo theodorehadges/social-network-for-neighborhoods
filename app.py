@@ -44,7 +44,6 @@ def index_page():
 @app.route('/profile/<int:profile_id>')
 @login_required
 def profile_page(profile_id):
-    # show about
     # show friends on map
     # show neighbors on map
     friends = get_all_friends(profile_id) # Change param to curent_user.id 
@@ -202,13 +201,16 @@ def register():
     if request.method == 'POST' and form.validate():
         password = form.password.data
         bcrypt_hash = bcrypt.generate_password_hash(password=password)
+        lat_lon = get_lat_lon_from_address(form.street.data, form.city.data,
+                form.state.data)
         try:
-            insert_user(form, bcrypt_hash)
+            insert_user(form, bcrypt_hash, lat_lon['lat'], lat_lon['lng'])
             found_user = User.query.filter_by(username=form.username.data).first()
             flask_login.login_user(found_user)
         except sqlalchemy.exc.IntegrityError as e:
             print(e)
-            return '<div id="success">failure</div>'
+            return '<div id="success">Registration unsuccessful. Please try \
+        a different username.</div>'
         return redirect('/neighborhood')
     return render_template('register.html', form=form)
 

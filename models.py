@@ -2,6 +2,7 @@ from flask_login import UserMixin
 from sqlalchemy import text, bindparam
 
 from app import db
+import requests
 
 
 class User(UserMixin, db.Model):
@@ -28,10 +29,9 @@ def get_thread_friend_unread(uid):
 
 def get_profile_info_from_uid(uid):
     record = db.session.execute(
-        """select u.firstname, u.lastname, p.description, p.photo, u.lat, u.long 
-        from userm u, profile p
-        where u.id = p.id
-        and u.id = :uid;""",
+        """select u.firstname, u.lastname, u.description, u.photo, u.lat, u.long 
+        from userm u
+        where u.id = :uid;""",
         {'uid': uid}
     ).fetchone()
     return record
@@ -380,10 +380,20 @@ def get_all_neighbors(cu_id):
     )
     return neighbors
 
+def get_lat_lon_from_address(street, city, state):
+    API_KEY = "AIzaSyDZ9FKI0IjDZJJK5vEyDb_Temr3QyZLfVs" 
+    
+    response = requests.get( \
+            'https://maps.googleapis.com/maps/api/geocode/json?address=' \
+            + street + ',' + city + ',' + state + '&key=' + API_KEY)
+    resp_json_payload = response.json()
+    
+    return(resp_json_payload['results'][0]['geometry']['location'])
 
 
 
-def insert_user(reg_form, bcrypt_hash):
+
+def insert_user(reg_form, bcrypt_hash, lat, lon):
     username = reg_form.username.data
     firstname = reg_form.firstname.data
     lastname = reg_form.lastname.data
@@ -392,18 +402,19 @@ def insert_user(reg_form, bcrypt_hash):
     city = reg_form.city.data
     zipcode = reg_form.zipcode.data
     state = reg_form.state.data
-    lat = reg_form.lat.data
-    long = reg_form.long.data
+    description = reg_form.description.data
     password = bcrypt_hash
     db.session.execute(
         """
-        insert into userm(username, password, firstname, lastname, email, street, city, state, zipcode, lat, long, created_on) 
-        values(:username, :password, :firstname, :lastname, :email, :street, :city, :state, :zipcode, 22, 33, now())
+        insert into userm(username, password, firstname, lastname, email,
+        description, street, city, state, zipcode, lat, long, created_on) 
+        values(:username, :password, :firstname, :lastname, :email,
+        :description, :street, :city, :state, :zipcode, :lat, :long, now())
         """,
         {"username": username, "password": password,
          "firstname": firstname, "lastname": lastname, "email": email,
-         "street": street, "city": city, "state": state, "zipcode": zipcode, "lat": lat,
-         "long": long}
+         "description": description, "street": street, "city": city, 
+         "state": state, "zipcode": zipcode, "lat": lat, "long": lon}
     )
     db.session.commit()
 

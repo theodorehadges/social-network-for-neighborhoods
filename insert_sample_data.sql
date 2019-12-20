@@ -11,24 +11,32 @@ insert into block(name, neighborhood_id) values('west 81st st between columbus a
 
 -----------------------------------------------------------------------------------------
 -- register
-insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
-    values('elaine','elaine', 'benes', 'eb@pendantpublishing.com', '16 west 75th street apt 2g',
+insert into userm(username, firstname, lastname, email, description, photo, street, city, state, zipcode, lat, long, block_id, created_on)
+    values('elaine','elaine', 'benes', 'eb@pendantpublishing.com',
+           'I once broke up with someone for not offering me pie.', 'all/photos/elaine','16 west 75th street apt 2g',
            'new york', 'ny', 10023, 40.778854, -73.973874, 1, now());
-insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
-    values('george','george', 'costanza', 'gcostanza@vandeleyindustries.com', '1344 queens blvd',
+insert into userm(username, firstname, lastname, email, description, photo, street, city, state, zipcode, lat, long, block_id, created_on)
+    values('george','george', 'costanza', 'gcostanza@vandeleyindustries.com',
+           'I am George and I love living in Queens since I am close to my parents, Frank and Estelle.',
+           'all/photos/george', '1344 queens blvd',
            'queens', 'ny', 11101,40.744303, -73.926108, 2, now());
-insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, created_on) -- no photo/block_id
+insert into userm(username, firstname, lastname, email, description, street, city, state, zipcode, lat, long, created_on) -- no photo/block_id
     values('art','art', 'vandeley', 'artvandaley@vandeleyindustries.com',
+           'Here at Vandeley Industries we sell and manufacture latex and latex related products.',
            '129 w 81st street 5a', 'new york', 'ny', 10024,
            40.784045, -73.974923, now());
-insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
-    values('jerry','jerry', 'seinfeld', 'jsein@nofaxmachine.com', '129 w 81st street 5a',
+insert into userm(username, firstname, lastname, email, description, photo, street, city, state, zipcode, lat, long, block_id, created_on)
+    values('jerry','jerry', 'seinfeld', 'jsein@nofaxmachine.com',
+           'Why do they call it Ovaltine? The mug is round. The jar is round.' ||
+           'They should call it Roundtine!', 'all/photos/jerry', '129 w 81st street 5a',
            'new york', 'ny', 10024, 40.784045, -73.974923, 3, now());
-insert into userm(username, firstname, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on)
-    values('cosmo','cosmo', 'kramer', 'kramer@kramericaindustries.com', '129 w 81st street 5b',
+insert into userm(username, firstname, lastname, email, description, photo, street, city, state, zipcode, lat, long, block_id, created_on)
+    values('cosmo','cosmo', 'kramer', 'kramer@kramericaindustries.com',
+           'It''s like a sauna in here.', 'all/photos/kramer', '129 w 81st street 5b',
            'new york', 'ny', 10024, 40.784045, -73.974923, 3, now());
-insert into userm(username, lastname, email, street, city, state, zipcode, lat, long, block_id, created_on) -- no first name
-    values('newman', 'newman', 'newman@postoffice.gov', '129 w 81st street 5e', 'new york',
+insert into userm(username, lastname, email, description, photo, street, city, state, zipcode, lat, long, block_id, created_on) -- no first name
+    values('newman', 'newman', 'newman@postoffice.gov',
+           'Hello Jerry.', 'all/photos/newman', '129 w 81st street 5e', 'new york',
            'ny', 10024, 40.784045, -73.974923, 3, now());
 -----------------------------------------------------------------------------------------
 -- Jerry logs in
@@ -37,20 +45,21 @@ insert into user_log(user_id, login_time) values(1, now()); -- Elaine (1) logs i
 
 -----------------------------------------------------------------------------------------
 -- insert profile data
-insert into profile(description, photo, user_id)
-    values('I once broke up with someone for not offering me pie.', 'all/photos/elaine', 1);
-insert into profile(description, photo, user_id)
-    values('I am George and I love living in Queens since I am close to my parents, Frank and Estelle.',
-           'all/photos/george', 2);
-insert into profile(description, user_id)
-    values('Here at Vandeley Industries we sell and manufacture latex and latex related products.', 3);
-insert into profile(description, photo, user_id)
-    values('Why do they call it Ovaltine? The mug is round. The jar is round.' ||
-           'They should call it Roundtine!', 'all/photos/jerry', 4);
-insert into profile(description, photo, user_id)
-    values('It''s like a sauna in here.', 'all/photos/kramer', 5);
-insert into profile(description, photo, user_id)
-    values('Hello Jerry.', 'all/photos/newman', 6);
+--insert into userm(description, photo, user_id)
+--    values('I once broke up with someone for not offering me pie.', 'all/photos/elaine', 1);
+--insert into userm(description, photo, user_id)
+ --   values('I am George and I love living in Queens since I am close to my parents, Frank and Estelle.',
+  --         'all/photos/george', 2);
+--insert into userm(description, user_id)
+ --   values('Here at Vandeley Industries we sell and manufacture latex and latex related products.', 3);
+--insert into userm(description, photo, user_id)
+ --   values('Why do they call it Ovaltine? The mug is round. The jar is round.' ||
+  --         'They should call it Roundtine!', 'all/photos/jerry', 4);
+
+--insert into userm(description, photo, user_id)
+ --   values('It''s like a sauna in here.', 'all/photos/kramer', 5);
+--insert into userm(description, photo, user_id)
+ --   values('Hello Jerry.', 'all/photos/newman', 6);
 
 -----------------------------------------------------------------------------------------
 -- populate neighbor table for upper west side neighbors (all users except id=2)
@@ -67,9 +76,9 @@ insert into neighbor(user_1_id, user_2_id) values (4, 6);
 
 
 -----------------------------------------------------------------------------------------
-update profile
-set description = 'Well, I saw that it''s raining outside, so I called in sick. I don''t work in the rain.'
-where profile.id = 6;
+--update profile
+--set description = 'Well, I saw that it''s raining outside, so I called in sick. I don''t work in the rain.'
+--where profile.id = 6;
 -----------------------------------------------------------------------------------------
 -- Jerry joins block. No other members, so he joins without approval
 insert into block_apply(pending_user, block_id, given_approval, created_on, decided_on)
