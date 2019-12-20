@@ -358,6 +358,13 @@ def get_user_list_minus_friends(cu_id):
         where user_1_id = :cu_id
         or user_2_id = :cu_id)
         select u.id, u.username, u.firstname, u.lastname
+        from uf inner join userm u on uf.uf_id = u.id)
+        except
+        (with uf as (select coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
+        from friend_request
+        where user_1_id = :cu_id
+        or user_2_id = :cu_id)
+        select u.id, u.username, u.firstname, u.lastname
         from uf inner join userm u on uf.uf_id = u.id)""",
         {"cu_id": cu_id}
     )

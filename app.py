@@ -48,7 +48,7 @@ def profile_page(profile_id):
     # show neighbors on map
     friends = get_all_friends(profile_id) # Change param to curent_user.id 
     #neighbors = get_all_neighbors(current_user.id)
-    userprofile = get_profile_info_from_uid(profile_id) 
+    userprofile = get_profile_info_from_uid(profile_id)
     return render_template("profile.html", friends=friends, userprofile=userprofile, cu=current_user)
 
 
@@ -152,7 +152,7 @@ def search():
 @login_required
 def possible_friends():
     form = FriendRequestForm(request.form)
-    users = get_user_list(current_user.id)
+    users = get_user_list_minus_friends(current_user.id)
     if form.validate_on_submit():
         friend_id = form.request_id.data
         make_request_record(current_user.id, friend_id)
