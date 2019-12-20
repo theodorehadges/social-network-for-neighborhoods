@@ -49,7 +49,6 @@ def profile_page(profile_id):
     friends = get_all_friends(profile_id) # Change param to curent_user.id 
     #neighbors = get_all_neighbors(current_user.id)
     userprofile = get_profile_info_from_uid(profile_id) 
-   
     return render_template("profile.html", friends=friends, userprofile=userprofile, cu=current_user)
 
 
@@ -212,7 +211,7 @@ def register():
             return '<div id="success">Registration unsuccessful. Please try \
         a different username. Redirecting back to Registration page...</div> \
         <meta http-equiv="refresh" content="4;url=register" />'
-        return redirect('/neighborhood')
+        return redirect('/blockapply')
     return render_template('register.html', form=form)
 
 

@@ -11,7 +11,7 @@
 <div id = friendlist">
 <ul>
 {% for friend in friends %}
-<li id={{ friend[0] }} uname={{ friend[2] }} class=list lat={{ friend[4] }} lng={{ friend[5] }}>{{ friend[2] }}
+<li id={{ friend[0] }} uname={{ friend[1] }} class=list lat={{ friend[4] }} lng={{ friend[5] }}>{{ friend[2] }}
   {{ friend[3] }}</li>
 {% endfor %}
 </ul>
@@ -54,13 +54,6 @@
             });
             marker.setMap(map);
         });
-        google.maps.event.addListener(map,'click',function(event) {
-        console.info(event.latLng.lat());  // print lat of click pos
-        console.info(event.latLng.lng());  // print lng of click pos
-
-        const friend_array = Array.from(document.querySelectorAll('#friendlist>ul>li'));
-        console.log("Get first: ", friend_array[0].textContent);
-    });
       }
 
     
