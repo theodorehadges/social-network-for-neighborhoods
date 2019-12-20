@@ -99,7 +99,7 @@ def insert_type_thread_query(thread_id, type, cu_id, uids):
     # t = t.bindparams(bindparam('uids', expanding=True))
 
 
-friend_query = "(select tm.thread_id, tm.title \
+friend_query = "(select distinct tm.thread_id, tm.title \
             from userm u inner join friend f on u.id = f.user_1_id or u.id \
             = f.user_2_id \
             inner join thread_friend tf on f.id = tf.friend_id \
@@ -108,7 +108,7 @@ friend_query = "(select tm.thread_id, tm.title \
             and (tm.body ilike :search_text \
             or tm.title ilike :search_text))"
 
-neighbor_query = """(select tm.thread_id, tm.title 
+neighbor_query = """(select distinct tm.thread_id, tm.title 
         from userm u inner join neighbor n on u.id = n.user_1_id or u.id 
             = n.user_2_id 
             inner join thread_neighbor tn on n.id = tn.neighbor_id 
@@ -117,7 +117,7 @@ neighbor_query = """(select tm.thread_id, tm.title
             and (tm.body ilike :search_text  
             or tm.title ilike :search_text))"""
 
-neighborhood_query = "(select tm.thread_id, tm.title \
+neighborhood_query = "(select distinct tm.thread_id, tm.title \
             from userm u inner join block b on u.block_id = b.id \
             inner join neighborhood nh on b.neighborhood_id = nh.id \
             inner join thread_neighborhood tnh on nh.id = tnh.neighborhood_id \
@@ -126,7 +126,7 @@ neighborhood_query = "(select tm.thread_id, tm.title \
             and (tm.body ilike :search_text  \
             or tm.title ilike :search_text))"
 
-block_query = "(select tm.thread_id, tm.title \
+block_query = "(select distinct tm.thread_id, tm.title \
             from userm u inner join thread_block tb \
             on u.block_id = tb.block_id \
             inner join thread_message tm on tm.thread_id =tb.thread_id \

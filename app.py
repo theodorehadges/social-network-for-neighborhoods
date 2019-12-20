@@ -158,8 +158,11 @@ def search():
 
     if form.validate_on_submit():
         search_type = form.search_type.data
+        print(search_type)
         search_text = form.search_text.data
         search_results = search_threads(current_user.id, search_type, search_text)
+        #for result in search_results:
+        #    print(result)
         return render_template("search_results.html", search_results=search_results, cu=current_user)
     return render_template("search.html", tform=form, cu=current_user)
    

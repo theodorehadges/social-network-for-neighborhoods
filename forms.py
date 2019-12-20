@@ -44,7 +44,7 @@ class ThreadUserForm(FlaskForm):
 class SearchForm(FlaskForm):
     #search_types = ["All threads, Friends, Neighborhood, Block"]
     search_type = SelectField("Search Type", choices=[("all",
-    "All Threads"), ("friends", "Friends"), ("neighbor", "Neighbor"), \
+    "All Threads"), ("friend", "Friends"), ("neighbor", "Neighbor"), \
             ("neighborhood", "Neighborhood"), ("block", "Block")], \
             validators = [validators.DataRequired()])
     search_text = StringField("Search Text", id="search_text", validators=[validators.DataRequired()])
