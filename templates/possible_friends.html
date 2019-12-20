@@ -4,8 +4,9 @@
 {% endblock %}
 {% block content %}
 {% from "_formhelpers.html" import render_field %}
+<h1>Friend Suggestions</h1>
 {% for user in users %}
-  <div><p>{{user[1]}}, {{user[2]}},{{user[3]}}</p></div>
+<div><p><b>{{user[1]}}</b> ({{user[2]}} {{user[3]}})</p></div>
   <form method="POST">
     {{ form.csrf_token() }}
     {{ form.request_id(id=user[0], value=user[0]) }}
