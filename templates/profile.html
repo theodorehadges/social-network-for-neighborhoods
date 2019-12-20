@@ -46,10 +46,10 @@
                     some_title = this.value;
                 }
             }
-          })
+          });
             console.log(lat_dict);
            var marker = new google.maps.Marker({
-               position: lat_dict,
+               position: {lat: 40.7126588, lng: -74.0141567},
               title: some_title
             });
             marker.setMap(map);
@@ -65,13 +65,6 @@
 
     
     </script>
-  <script>var marker = new google.maps.Marker({
-              position: {lat: 40.7126588, lng: -74.0141567},
-              title:"Elaine's House"
-        });
-        marker.setMap(map);
-  </script>
-
     <script
          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZ9FKI0IjDZJJK5vEyDb_Temr3QyZLfVs&callback=initMap"
              async defer></script>

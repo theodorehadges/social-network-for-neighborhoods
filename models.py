@@ -275,15 +275,22 @@ def insert_message_read(message_id, thread_id, cu_id):
     db.session.execute(
         """
         insert into message_read(message_id, thread_id, user_id)
-        (select :message_id, :thread_id, friend_id as uid
-from thread_friend tf
+        ((select :message_id, :thread_id, user_1_id as uid
+from thread_friend tf inner join friend f on tf.friend_id = f.id
 where tf.thread_id = :thread_id)
 union
+(select :message_id, :thread_id, user_2_id as uid
+from thread_friend tf inner join friend f on tf.friend_id = f.id
+where tf.thread_id = :thread_id))
+union
 --neighbor
-(select :message_id, :thread_id,  tn.neighbor_id as uid
-from thread_neighbor tn
-where tn.thread_id = :thread_id
-)
+((select :message_id, :thread_id, user_1_id as uid
+from thread_neighbor tn inner join neighbor n on tn.neighbor_id = n.id
+where tn.thread_id = :thread_id)
+union
+(select :message_id, :thread_id, user_2_id as uid
+from thread_neighbor tn inner join neighbor n on tn.neighbor_id = n.id
+where tn.thread_id = :thread_id))
 union
 --neighborhood
 (select :message_id, :thread_id, u.id as uid

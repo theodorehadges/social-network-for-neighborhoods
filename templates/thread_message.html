@@ -17,10 +17,10 @@
     {{ form.csrf_token() }}
         {{ form.thread_id(id=thread_id, value=thread_id) }}
   <div class="form-group">
-    {{ form.title() }}
+    {{ render_field(form.title) }}
   </div>
   <div class="form-group">
-    {{ form.body() }}
+    {{ render_field(form.body) }}
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
