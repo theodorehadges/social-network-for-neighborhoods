@@ -1,5 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, PasswordField, validators, TextAreaField, HiddenField, SubmitField, SelectField
+from wtforms import BooleanField, StringField, PasswordField, validators, TextAreaField, HiddenField, SubmitField, \
+    SelectField, SelectMultipleField
+from wtforms.validators import Required
+from wtforms.widgets import CheckboxInput, ListWidget
 
 
 class LoginForm(FlaskForm):
@@ -24,9 +27,20 @@ class ThreadForm(FlaskForm):
     title = StringField("Title", id="title", validators=[validators.DataRequired()])
     # Can you text area.
     body = StringField("Message", id="message", validators=[validators.DataRequired()])
-    search_type = SelectField("Search Type", choices=[("friends", "Friends"), ("neighbor", "Neighbor"), \
-            ("neighborhood", "Neighborhood"), ("block", "Block")], \
-            validators=[validators.DataRequired()])
+    make_type = SelectField("Make Thread Type", choices=[("neighborhood", "Neighborhood"), ("block", "Block")])
+
+class MultiCheckboxField(SelectMultipleField):
+    widget			= ListWidget(prefix_label=False)
+    option_widget	= CheckboxInput()
+
+
+class ThreadUserForm(FlaskForm):
+    title = StringField("Title", id="title", validators=[validators.DataRequired()])
+    body = StringField("Message", id="message", validators=[validators.DataRequired()])
+    # user_choice = SelectMultipleField("Pick Users to start group", choices=[])
+    user_choice = MultiCheckboxField('Please select users you want to have a conversation with',
+                                     choices=[])
+
 
 class SearchForm(FlaskForm):
     #search_types = ["All threads, Friends, Neighborhood, Block"]

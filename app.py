@@ -9,7 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, redirect, request, flash, render_template, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from forms import RegistrationForm, LoginForm, ThreadForm, FriendRequestForm, FriendAcceptForm, SearchForm, MessageForm, \
-    Neighborhood
+    Neighborhood, ThreadUserForm
 from models import *
 from util import make_thread_message_into_thread
 
@@ -78,10 +78,43 @@ def thread():
     if form.validate_on_submit():
         title = form.title.data
         body = form.body.data
-        type = form.search_type.data
-        thread_id = make_thread(current_user.id, title, body, type)
+        type = form.make_type.data
+        thread_id = make_thread(current_user.id, title, body, type, None)
         return redirect("/thread/{}".format(thread_id))
     return render_template("thread.html", tform=form)
+
+
+@app.route('/thread/friend', methods=['GET', 'POST'])
+@login_required
+def thread_friend():
+    users = get_all_friends(current_user.id)
+    form = ThreadUserForm(request.form)
+    users_choice = [(x[0], x[1]) for x in users]
+    form.user_choice.choices = users_choice
+    if request.method == 'POST':
+        title = form.title.data
+        body = form.body.data
+        uids = form.user_choice.data
+        thread_id = make_thread(current_user.id, title, body, 'friend', uids)
+        return redirect("/thread/{}".format(thread_id))
+    return render_template("thread_user.html", form=form)
+
+
+@app.route('/thread/neighbor', methods=['GET', 'POST'])
+@login_required
+def thread_neighbor():
+    users = get_all_neighbors(current_user.id)
+    form = ThreadUserForm(request.form)
+    users_choice = [(x[0], x[1]) for x in users]
+    form.user_choice.choices = users_choice
+    if request.method == 'POST':
+        title = form.title.data
+        body = form.body.data
+        uids = form.user_choice.data
+        thread_id = make_thread(current_user.id, title, body, 'neighbor', uids)
+        return redirect("/thread/{}".format(thread_id))
+    return render_template("thread_user.html", form=form)
+
 
 
 @app.route('/thread/<int:thread_id>')
@@ -101,8 +134,6 @@ def message_reply():
         title = form.title.data
         message = form.body.data
         message_id = insert_message_reply(thread_id, current_user.id, title, message)
-        insert_message_read(message_id, thread_id, current_user.id)
-        update_message_read(message_id, thread_id, current_user.id)
         return redirect('/thread/{}'.format(thread_id))
 
 @app.route('/thread/search', methods=['GET', 'POST'])
@@ -236,6 +267,7 @@ def neighborhood():
             update_block_on_uid(current_user.id, block_id)
         return redirect("/feeds")
     return render_template("neighborhood.html", form=form)
+
 
 @app.route('/pending_block_approval', methods=['GET', 'POST'])
 @login_required

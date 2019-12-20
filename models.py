@@ -1,4 +1,6 @@
 from flask_login import UserMixin
+from sqlalchemy import text, bindparam
+
 from app import db
 
 
@@ -35,46 +37,67 @@ def get_profile_info_from_uid(uid):
     return record
 
 
-def make_thread(uid, title, body, type):
+def make_thread(uid, title, body, type, uids):
     thread = db.session.execute(
             """with rows as (insert into thread(name, created_on) VALUES (:title, now()) RETURNING id)
     select id from rows;
             """,
         {"title": title}).fetchone()
-    db.session.commit()
-    insert_type_thread_query(thread[0], type, uid)
+    insert_type_thread_query(thread[0], type, uid, uids)
     insert_message_reply(thread[0], uid, title, body)
+    db.session.commit()
     return thread[0]
 
 
-def insert_type_thread_query(thread_id, type, cu_id):
-    if type == "friends":
+def insert_type_thread_query(thread_id, type, cu_id, uids):
+    if type == "friend":
         query = """insert into thread_friend(thread_id, friend_id) 
-                    select :thread_id, coalesce(nullif(user_1_id, :cu_id), user_2_id) as uf_id
+                    (select :thread_id, id
+                    from friend
+                    where user_1_id = :uid
+                    and user_2_id = :cu_id)
+                    union
+                    (select :thread_id, id
                     from friend
                     where user_1_id = :cu_id
-                    or user_2_id = :cu_id"""
+                    and user_2_id = :uid)"""
+        for uid in uids:
+            db.session.execute(query, {"thread_id": thread_id, "cu_id": cu_id, "uid": uid})
+        db.session.commit()
     elif type == "neighborhood":
         query = """insert into thread_neighborhood(thread_id, neighborhood_id) 
-                    select :thread_id, block_id 
+                    select :thread_id, neighborhood_id 
                     from userm u inner join block b on b.id = u.block_id
                     inner join neighborhood n on n.id = b.neighborhood_id 
                     where id = :cu_id"""
+        db.session.execute(query, {"thread_id": thread_id, "cu_id": cu_id, "uid": uids})
+        db.session.commit()
     elif type == "neighbor":
         query = """insert into thread_neighbor(thread_id, neighbor_id) 
-                    select :thread_id, coalesce(nullif(user_1_id, :cu_id), user_2_id) as n_id
+                    (select :thread_id, id
+                    from neighbor
+                    where user_1_id = :uid
+                    and user_2_id = :cu_id)
+                    union
+                    (select :thread_id, id
                     from neighbor
                     where user_1_id = :cu_id
-                    or user_2_id = :cu_id"""
+                    and user_2_id = :uid)"""
+        for uid in uids:
+            db.session.execute(query, {"thread_id": thread_id, "cu_id": cu_id, "uid": uid})
+        db.session.commit()
     elif type == "block":
         query = """insert into thread_block(thread_id, block_id) 
                     select :thread_id, block_id 
                     from userm
                     where id = :cu_id"""
+        db.session.execute(query, {"thread_id": thread_id, "cu_id": cu_id, "uid": uids})
+        db.session.commit()
     else:
         print("something went wrong couldn't insert into anything")
-    db.session.execute(query, {"thread_id": thread_id, "cu_id": cu_id})
-    db.session.commit()
+    # t = text(query)
+    # t = t.bindparams(bindparam('uids', expanding=True))
+
 
 friend_query = "(select tm.thread_id, tm.title \
             from userm u inner join friend f on u.id = f.user_1_id or u.id \
@@ -243,6 +266,8 @@ def insert_message_reply(thread_id, cu_id, title, body):
             """,
         {"thread_id": thread_id, "cu_id": cu_id, "title": title, "body": body}).fetchone()
     db.session.commit()
+    insert_message_read(message[0], thread_id, cu_id)
+    update_message_read(message[0], thread_id, cu_id)
     return message[0]
 
 
