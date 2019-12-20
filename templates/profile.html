@@ -11,8 +11,9 @@
 <div id = friendlist">
 <ul>
 {% for friend in friends %}
-<li id={{ friend[0] }} uname={{ friend[1] }} class=list lat={{ friend[4] }} lng={{ friend[5] }}>{{ friend[2] }}
-  {{ friend[3] }}</li>
+<li id={{ friend[0] }} uname={{ friend[1] }} class=list lat={{ friend[4] }}
+  lng={{ friend[5] }}><a href="/profile/{{ friend[0] }}">{{ friend[2] }}
+    {{ friend[3] }}</a></li>
 {% endfor %}
 </ul>
 </div>

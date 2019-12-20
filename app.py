@@ -171,7 +171,7 @@ def pending_friends():
             update_request_friends(current_user.id, r_id, True)
         else:
             update_request_friends(current_user.id, r_id, False)
-        return redirect('friends')
+        return redirect('pending_friends')
     return render_template("pending_friends.html", form=form, users=pfriends, cu=current_user)
 
 

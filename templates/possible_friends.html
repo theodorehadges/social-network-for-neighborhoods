@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
 {% from "_formhelpers.html" import render_field %}
-<h1>Friend Suggestions</h1>
+<h1>User Suggestions</h1>
 {% for user in users %}
 <div><p><b>{{user[1]}}</b> ({{user[2]}} {{user[3]}})</p></div>
   <form method="POST">
